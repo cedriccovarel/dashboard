@@ -3,7 +3,6 @@ MYTOOLAPP + GOOGLE AGENDA
 1. Dépose index.html sur GitHub Pages.
 2. Dans Google Cloud, active Google Calendar API.
 3. Crée un OAuth Client ID de type Application Web.
-4. Dans « Origines JavaScript autorisées », ajoute l’origine affichée dans Mytoolapp > Réglages (ex. https://cedriccovarel.github.io).
 5. Crée une clé API et restreins-la idéalement à Google Calendar API + à ton domaine GitHub Pages.
 6. Dans Mytoolapp > Réglages, colle le Client ID et la clé API, puis clique « Se connecter avec Google ».
 

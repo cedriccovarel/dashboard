@@ -181,20 +181,19 @@
     </div>
 
     <div class="settings-row">
-      <div class="switch-line"><div><h3>Afficher Google Agenda</h3><p style="margin:0">Affiche ou masque le widget Agenda.</p></div><input class="switch" type="checkbox" id="calendarToggle" /></div>
+      <div class="switch-line"><div><h3>Afficher l’Agenda</h3><p style="margin:0">Affiche ou masque le widget Agenda.</p></div><input class="switch" type="checkbox" id="calendarToggle" /></div>
     </div>
 
     <div class="settings-row">
-      <h3>Connexion Google Agenda</h3>
-      <p>Mytoolapp lit uniquement tes prochains rendez-vous via l’API Google Calendar. Ton agenda n’a pas besoin d’être public.</p>
-      <div class="field"><label>Client ID Google</label><input id="calendarClientId" placeholder="...apps.googleusercontent.com" autocomplete="off" /></div>
-      <div class="field" style="margin-bottom:9px"><label>Clé API Google</label><input id="calendarApiKey" placeholder="AIza..." autocomplete="off" /></div>
-      <p class="settings-help" id="googleOriginHelp"></p>
+      <h3>Connecteur Google Agenda</h3>
+      <p>Compatible Chrome et Plash. Mytoolapp récupère uniquement les prochains rendez-vous via ton connecteur Apps Script, sans connexion Google dans cette page.</p>
+      <div class="field"><label>URL du connecteur Apps Script</label><input id="calendarConnectorUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" /></div>
+      <div class="field" style="margin-bottom:9px"><label>Clé d’accès</label><input id="calendarAccessKey" type="password" placeholder="Clé générée par setupConnector()" autocomplete="off" /></div>
+      <p class="settings-help">L’URL et la clé sont conservées uniquement dans ce navigateur. Ne mets jamais la clé directement dans le fichier GitHub.</p>
       <div class="row-actions" style="margin-top:10px">
-        <button class="btn" id="saveGoogleCalendar">Enregistrer</button>
-        <button class="btn primary" id="googleConnectBtn">Se connecter avec Google</button>
-        <button class="btn" id="googleDisconnectBtn" style="display:none">Déconnecter</button>
-        <span class="connection-state" id="googleConnectionState">Non connecté</span>
+        <button class="btn" id="saveCalendarConnector">Enregistrer</button>
+        <button class="btn primary" id="testCalendarConnector">Tester la connexion</button>
+        <span class="connection-state" id="calendarConnectionState">Non configuré</span>
       </div>
     </div>
 
@@ -234,12 +233,12 @@ const defaultApps=[
 
 function getState(){
  try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw)}catch(e){}
- return {apps:defaultApps,calendar:{visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510}};
+ return {apps:defaultApps,calendar:{visible:true,connectorUrl:'',accessKey:'',x:null,y:98,w:390,h:510}};
 }
 let state=getState();
-if(!state.calendar) state.calendar={visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510};
-state.calendar.clientId=state.calendar.clientId||'';
-state.calendar.apiKey=state.calendar.apiKey||'';
+if(!state.calendar) state.calendar={visible:true,connectorUrl:'',accessKey:'',x:null,y:98,w:390,h:510};
+state.calendar.connectorUrl=state.calendar.connectorUrl||'';
+state.calendar.accessKey=state.calendar.accessKey||'';
 if(state.calendar.x===undefined) state.calendar.x=null;
 if(state.calendar.y===undefined) state.calendar.y=98;
 if(state.calendar.w===undefined) state.calendar.w=390;
@@ -323,133 +322,122 @@ wallpaperClear.onclick=async()=>{await dbDel('wallpaper');await applyWallpaper()
 function resizeImage(file,maxW,maxH,quality){return new Promise(resolve=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxW/img.width,maxH/img.height);const c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',quality))};img.src=r.result};r.readAsDataURL(file)})}
 
 const cal=document.getElementById('calendarWidget'),calBody=document.getElementById('calendarBody');
-const DISCOVERY_DOC='https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-const GOOGLE_SCOPE='https://www.googleapis.com/auth/calendar.readonly';
-let gapiLibraryReady=false, gisLibraryReady=false, googleClientReady=false, tokenClient=null;
-let initializedClientId='', initializedApiKey='';
+let calendarLastSuccess=0;
 
-function calendarConfigReady(){return !!(state.calendar?.clientId&&state.calendar?.apiKey)}
-function googleToken(){try{return window.gapi?.client?.getToken?.()||null}catch(e){return null}}
-function isGoogleConnected(){return !!googleToken()?.access_token}
+function calendarConfigReady(){return !!(state.calendar?.connectorUrl&&state.calendar?.accessKey)}
 
 function renderCalendar(){
- const c=state.calendar||{visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510};state.calendar=c;
+ const c=state.calendar||{visible:true,connectorUrl:'',accessKey:'',x:null,y:98,w:390,h:510};state.calendar=c;
  cal.classList.toggle('hidden',!c.visible);cal.style.width=(c.w||390)+'px';cal.style.height=(c.h||510)+'px';cal.style.top=(c.y||98)+'px';
  if(c.x===null||c.x===undefined){cal.style.left=(window.innerWidth-(c.w||390)-30)+'px'}else cal.style.left=c.x+'px';
  if(!calendarConfigReady()){
-   calBody.innerHTML=`<div class="calendar-connect"><div><div class="icon">31</div><strong>Configurer Google Agenda</strong><p>Ajoute ton Client ID et ta clé API dans Réglages. Ton agenda reste privé.</p><button id="calendarSetupBtn">Configurer</button></div></div>`;
+   calBody.innerHTML=`<div class="calendar-connect"><div><div class="icon">31</div><strong>Configurer Google Agenda</strong><p>Ajoute l’URL du connecteur Apps Script et ta clé d’accès dans Réglages.</p><button id="calendarSetupBtn">Configurer</button></div></div>`;
    document.getElementById('calendarSetupBtn')?.addEventListener('click',()=>settingsBtn.click());
-   return;
- }
- if(!isGoogleConnected()){
-   calBody.innerHTML=`<div class="calendar-connect"><div><div class="icon">G</div><strong>Google Agenda</strong><p>Connecte ton compte Google pour afficher tes prochains rendez-vous.</p><button id="calendarConnectInline">Se connecter</button></div></div>`;
-   document.getElementById('calendarConnectInline')?.addEventListener('click',handleGoogleAuth);
    return;
  }
  loadCalendarEvents();
 }
 
-function formatDayKey(dateLike){const d=new Date(dateLike);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function formatDayKey(dateLike){
+ if(/^\d{4}-\d{2}-\d{2}$/.test(String(dateLike||''))) return String(dateLike);
+ const d=new Date(dateLike);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
 function dayLabel(dateLike){
- const d=new Date(dateLike), today=new Date(), tomorrow=new Date();tomorrow.setDate(today.getDate()+1);
- const key=formatDayKey(d),tk=formatDayKey(today),tmk=formatDayKey(tomorrow);
+ const d=/^\d{4}-\d{2}-\d{2}$/.test(String(dateLike||''))?new Date(String(dateLike)+'T12:00:00'):new Date(dateLike), today=new Date(), tomorrow=new Date();tomorrow.setDate(today.getDate()+1);
+ const key=formatDayKey(dateLike),tk=formatDayKey(today),tmk=formatDayKey(tomorrow);
  if(key===tk)return "Aujourd’hui";if(key===tmk)return "Demain";
  return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long'}).format(d);
 }
 function eventTime(ev){
- if(ev.start?.date&&!ev.start?.dateTime)return 'Journée';
- const d=new Date(ev.start?.dateTime||ev.start?.date);return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(d);
+ if(ev.allDay)return 'Journée';
+ const d=new Date(ev.start);return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(d);
 }
-function eventStart(ev){return ev.start?.dateTime||ev.start?.date||new Date().toISOString()}
-function eventMeta(ev){return ev.location||ev.organizer?.displayName||''}
+function eventStart(ev){return ev.allDay?(ev.date||formatDayKey(ev.start)):(ev.start||new Date().toISOString())}
+function eventMeta(ev){return ev.location||''}
 
-async function loadCalendarEvents(){
- if(!isGoogleConnected()){renderCalendar();return}
+function connectorRequest(){
+ return new Promise((resolve,reject)=>{
+   if(!calendarConfigReady()){reject(new Error('Connecteur non configuré'));return}
+   let base;
+   try{base=new URL(state.calendar.connectorUrl.trim())}catch(e){reject(new Error('URL du connecteur invalide'));return}
+   const callback='__mytoolappCalendar_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+   const script=document.createElement('script');
+   let done=false;
+   const cleanup=()=>{if(done)return;done=true;clearTimeout(timer);try{delete window[callback]}catch(e){window[callback]=undefined}script.remove()};
+   window[callback]=(payload)=>{cleanup();resolve(payload)};
+   base.searchParams.set('key',state.calendar.accessKey);
+   base.searchParams.set('days','14');
+   base.searchParams.set('max','12');
+   base.searchParams.set('callback',callback);
+   base.searchParams.set('_',String(Date.now()));
+   script.src=base.toString();script.async=true;
+   script.onerror=()=>{cleanup();reject(new Error('Impossible de joindre le connecteur Apps Script'))};
+   const timer=setTimeout(()=>{cleanup();reject(new Error('Le connecteur ne répond pas'))},12000);
+   document.head.appendChild(script);
+ });
+}
+
+async function loadCalendarEvents(showSuccess=false){
+ if(!calendarConfigReady()){renderCalendar();return}
  calBody.innerHTML='<div class="calendar-loading">Chargement de l’agenda…</div>';
+ updateCalendarConnectionUI('Connexion…',false);
  try{
-   const now=new Date(), until=new Date();until.setDate(until.getDate()+14);
-   const response=await gapi.client.calendar.events.list({calendarId:'primary',timeMin:now.toISOString(),timeMax:until.toISOString(),showDeleted:false,singleEvents:true,maxResults:12,orderBy:'startTime'});
-   const events=response.result.items||[];
-   renderCalendarEvents(events);
+   const payload=await connectorRequest();
+   if(!payload||payload.ok!==true)throw new Error(payload?.error==='unauthorized'?'Clé d’accès incorrecte':(payload?.message||payload?.error||'Réponse invalide du connecteur'));
+   const events=Array.isArray(payload.events)?payload.events:[];
+   calendarLastSuccess=Date.now();
+   updateCalendarConnectionUI('Connecté',true);
+   renderCalendarEvents(events,payload);
+   if(showSuccess) setTimeout(()=>updateCalendarConnectionUI('Connecté',true),50);
  }catch(err){
    console.error(err);
-   const msg=escapeHTML(err?.result?.error?.message||err?.message||'Impossible de charger Google Agenda.');
-   calBody.innerHTML=`<div class="calendar-content"><div class="calendar-error"><strong>Agenda indisponible</strong><br>${msg}<br><br><button class="btn" id="calendarReconnectBtn">Reconnecter Google</button></div></div>`;
-   document.getElementById('calendarReconnectBtn')?.addEventListener('click',handleGoogleAuth);
+   const msg=escapeHTML(err?.message||'Impossible de charger Google Agenda.');
+   updateCalendarConnectionUI('Erreur',false);
+   calBody.innerHTML=`<div class="calendar-content"><div class="calendar-error"><strong>Agenda indisponible</strong><br>${msg}<br><br><button class="btn" id="calendarSettingsBtn">Vérifier les réglages</button></div></div>`;
+   document.getElementById('calendarSettingsBtn')?.addEventListener('click',()=>settingsBtn.click());
  }
 }
 
-function renderCalendarEvents(events){
+function renderCalendarEvents(events,payload={}){
  const groups=new Map();
  for(const ev of events){const start=eventStart(ev);const key=formatDayKey(start);if(!groups.has(key))groups.set(key,{date:start,events:[]});groups.get(key).events.push(ev)}
  let body='';
- if(!events.length){body='<div class="calendar-connect"><div><div class="icon">✓</div><strong>Aucun rendez-vous à venir</strong><p>Rien de prévu dans les 14 prochains jours.</p></div></div>';calBody.innerHTML=body;return}
+ if(!events.length){calBody.innerHTML='<div class="calendar-connect"><div><div class="icon">✓</div><strong>Aucun rendez-vous à venir</strong><p>Rien de prévu dans les 14 prochains jours.</p></div></div>';return}
  for(const group of groups.values()){
    body+=`<section class="calendar-day"><div class="calendar-day-title">${escapeHTML(dayLabel(group.date))}</div>`;
    for(const ev of group.events){
-     const title=escapeHTML(ev.summary||'Sans titre'),time=escapeHTML(eventTime(ev)),meta=escapeHTML(eventMeta(ev)),href=escapeHTML(ev.htmlLink||'https://calendar.google.com/calendar/u/0/r');
-     body+=`<a class="calendar-event" href="${href}" target="_blank" rel="noopener"><div class="calendar-time">${time}</div><div class="calendar-event-main"><div class="calendar-event-title">${title}</div>${meta?`<div class="calendar-event-meta">${meta}</div>`:''}</div></a>`;
+     const title=escapeHTML(ev.title||'Sans titre'),time=escapeHTML(eventTime(ev)),meta=escapeHTML(eventMeta(ev));
+     body+=`<div class="calendar-event"><div class="calendar-time">${time}</div><div class="calendar-event-main"><div class="calendar-event-title">${title}</div>${meta?`<div class="calendar-event-meta">${meta}</div>`:''}</div></div>`;
    }
    body+='</section>';
  }
- calBody.innerHTML=`<div class="calendar-content"><div class="calendar-status"><span><span class="dot"></span>Google Agenda connecté</span><span>${events.length} événement${events.length>1?'s':''}</span></div>${body}<a class="calendar-footer-link" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">Ouvrir Google Agenda ↗</a></div>`;
+ const source=payload.calendarName?` · ${escapeHTML(payload.calendarName)}`:'';
+ calBody.innerHTML=`<div class="calendar-content"><div class="calendar-status"><span><span class="dot"></span>Agenda connecté${source}</span><span>${events.length} événement${events.length>1?'s':''}</span></div>${body}<a class="calendar-footer-link" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">Ouvrir Google Agenda ↗</a></div>`;
 }
 
-async function initializeGoogleCalendar(force=false){
- if(!gapiLibraryReady||!gisLibraryReady||!calendarConfigReady())return false;
- const clientId=state.calendar.clientId.trim(),apiKey=state.calendar.apiKey.trim();
- if(googleClientReady&&!force&&initializedClientId===clientId&&initializedApiKey===apiKey)return true;
- try{
-   await gapi.client.init({apiKey,discoveryDocs:[DISCOVERY_DOC]});
-   tokenClient=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:GOOGLE_SCOPE,callback:()=>{}});
-   googleClientReady=true;initializedClientId=clientId;initializedApiKey=apiKey;updateGoogleConnectionUI();return true;
- }catch(err){console.error('Google init error',err);googleClientReady=false;updateGoogleConnectionUI('Erreur de configuration');return false}
+function saveCalendarConnectorConfig(){
+ const url=(document.getElementById('calendarConnectorUrl')?.value||state.calendar.connectorUrl||'').trim();
+ const key=(document.getElementById('calendarAccessKey')?.value||state.calendar.accessKey||'').trim();
+ state.calendar.connectorUrl=url;state.calendar.accessKey=key;saveState();renderCalendar();syncSettings();
 }
 
-async function handleGoogleAuth(){
- saveGoogleCalendarConfig();
- const ready=await initializeGoogleCalendar();
- if(!ready){alert('Vérifie le Client ID Google et la clé API dans Réglages.');return}
- tokenClient.callback=async(resp)=>{
-   if(resp.error!==undefined){console.error(resp);updateGoogleConnectionUI('Connexion refusée');return}
-   updateGoogleConnectionUI();hideModal(settingsModal);await loadCalendarEvents();
- };
- if(gapi.client.getToken()===null)tokenClient.requestAccessToken({prompt:'consent'});else tokenClient.requestAccessToken({prompt:''});
+async function testCalendarConnector(){
+ saveCalendarConnectorConfig();
+ if(!calendarConfigReady()){alert('Renseigne l’URL du connecteur et la clé d’accès.');return}
+ await loadCalendarEvents(true);
 }
 
-function googleSignOut(){
- const token=googleToken();
- if(token?.access_token&&window.google?.accounts?.oauth2){google.accounts.oauth2.revoke(token.access_token,()=>{});}
- try{gapi.client.setToken(null)}catch(e){}
- updateGoogleConnectionUI();renderCalendar();
+function updateCalendarConnectionUI(message='',ok=false){
+ const s=document.getElementById('calendarConnectionState');if(!s)return;
+ const configured=calendarConfigReady();
+ s.classList.toggle('ok',!!ok);s.textContent=message||(configured?(calendarLastSuccess?'Connecté':'Configuré'):'Non configuré');
 }
-
-function saveGoogleCalendarConfig(){
- const cid=(document.getElementById('calendarClientId')?.value||state.calendar.clientId||'').trim();
- const key=(document.getElementById('calendarApiKey')?.value||state.calendar.apiKey||'').trim();
- const changed=cid!==state.calendar.clientId||key!==state.calendar.apiKey;
- state.calendar.clientId=cid;state.calendar.apiKey=key;saveState();
- if(changed){googleClientReady=false;initializedClientId='';initializedApiKey='';try{gapi.client.setToken(null)}catch(e){}}
- initializeGoogleCalendar(true);renderCalendar();updateGoogleConnectionUI();
-}
-
-function updateGoogleConnectionUI(message=''){
- const s=document.getElementById('googleConnectionState'),disc=document.getElementById('googleDisconnectBtn');
- if(!s)return;
- const connected=isGoogleConnected();
- s.classList.toggle('ok',connected);s.textContent=message||(connected?'Connecté':'Non connecté');
- if(disc)disc.style.display=connected?'inline-flex':'none';
-}
-
-window.gapiLoaded=function(){gapi.load('client',async()=>{gapiLibraryReady=true;await initializeGoogleCalendar();updateGoogleConnectionUI()})};
-window.gisLoaded=function(){gisLibraryReady=true;initializeGoogleCalendar();updateGoogleConnectionUI()};
 
 calendarHide.onclick=()=>{state.calendar.visible=false;saveState();renderCalendar()};
-calendarRefresh.onclick=()=>isGoogleConnected()?loadCalendarEvents():renderCalendar();
+calendarRefresh.onclick=()=>loadCalendarEvents();
 calendarToggle.onchange=()=>{state.calendar.visible=calendarToggle.checked;saveState();renderCalendar()};
-document.getElementById('saveGoogleCalendar').onclick=saveGoogleCalendarConfig;
-document.getElementById('googleConnectBtn').onclick=handleGoogleAuth;
-document.getElementById('googleDisconnectBtn').onclick=googleSignOut;
+document.getElementById('saveCalendarConnector').onclick=saveCalendarConnectorConfig;
+document.getElementById('testCalendarConnector').onclick=testCalendarConnector;
 
 function makeWidgetDraggable(){
  const handle=document.getElementById('calendarDrag');let drag=false,ox=0,oy=0;
@@ -461,10 +449,9 @@ function makeWidgetDraggable(){
 
 function syncSettings(){
  calendarToggle.checked=state.calendar?.visible!==false;
- document.getElementById('calendarClientId').value=state.calendar?.clientId||'';
- document.getElementById('calendarApiKey').value=state.calendar?.apiKey||'';
- document.getElementById('googleOriginHelp').textContent=`Origine JavaScript autorisée à ajouter dans Google Cloud : ${location.origin}`;
- updateGoogleConnectionUI();
+ document.getElementById('calendarConnectorUrl').value=state.calendar?.connectorUrl||'';
+ document.getElementById('calendarAccessKey').value=state.calendar?.accessKey||'';
+ updateCalendarConnectionUI();
 }
 autoArrangeBtn=document.getElementById('autoArrange');autoArrangeBtn.onclick=autoArrange;
 
@@ -473,13 +460,12 @@ exportBtn.onclick=async()=>{
 };
 importBtn.onclick=()=>importFile.click();
 importFile.onchange=()=>{const f=importFile.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const p=JSON.parse(r.result);if(p.state)state=p.state;else state=p;if(p.wallpaper)await dbSet('wallpaper',p.wallpaper);saveState();renderApps();renderCalendar();await applyWallpaper();alert('Configuration importée.')}catch(e){alert('Fichier invalide.')}};r.readAsText(f)};
-resetBtn.onclick=async()=>{if(!confirm('Réinitialiser Mytoolapp ?'))return;localStorage.removeItem(STORAGE_KEY);await dbDel('wallpaper');state={apps:JSON.parse(JSON.stringify(defaultApps)),calendar:{visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510}};saveState();renderApps();renderCalendar();await applyWallpaper()};
+resetBtn.onclick=async()=>{if(!confirm('Réinitialiser Mytoolapp ?'))return;localStorage.removeItem(STORAGE_KEY);await dbDel('wallpaper');state={apps:JSON.parse(JSON.stringify(defaultApps)),calendar:{visible:true,connectorUrl:'',accessKey:'',x:null,y:98,w:390,h:510}};saveState();renderApps();renderCalendar();await applyWallpaper()};
 
 window.addEventListener('resize',()=>{state.apps.forEach(a=>{a.x=Math.min(a.x??0,window.innerWidth-106);a.y=Math.min(a.y??98,window.innerHeight-118)});saveState();renderApps();renderCalendar()});
 
 renderApps();renderCalendar();makeWidgetDraggable();applyWallpaper();
+setInterval(()=>{if(state.calendar?.visible&&calendarConfigReady())loadCalendarEvents()},5*60*1000);
 </script>
-<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>

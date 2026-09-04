@@ -4,142 +4,319 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mytoolapp</title>
-<meta name="theme-color" content="#f4f7f5" />
 <style>
-:root{
-  --bg:#f4f7f5;
-  --panel:#fff;
-  --line:#dfe8e3;
-  --text:#19382e;
-  --muted:#7a8881;
-  --green:#1f5a44;
-  --green2:#2f715a;
-  --soft:#eaf2ed;
-  --danger:#b84f57;
-  --shadow:0 8px 24px rgba(31,90,68,.06);
-  --shadow2:0 14px 30px rgba(31,90,68,.10);
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-button,input,select{font:inherit} button{cursor:pointer}
-.shell{width:min(1380px,calc(100% - 40px));margin:0 auto;padding:24px 0 54px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}
-.brand{font-size:21px;font-weight:800;letter-spacing:-.025em;color:var(--green)}
-.actions{display:flex;gap:9px;align-items:center}
-.btn{border-radius:11px;padding:11px 14px;font-size:13px;font-weight:750;border:1px solid var(--line);background:#fff;color:var(--text)}
-.btn:hover{border-color:#bfd0c7;background:#fbfcfb}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.primary:hover{background:var(--green2)}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.card{position:relative;min-height:246px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:.16s ease;overflow:hidden}
-.card:hover{transform:translateY(-2px);border-color:#c6d7ce;box-shadow:var(--shadow2)}
-.card.dragging{opacity:.42;transform:scale(.985)}.card.drag-over{border-color:#8caf9d;box-shadow:0 0 0 3px rgba(31,90,68,.08),var(--shadow2)}
-.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.logo{width:112px;height:112px;border-radius:22px;overflow:hidden;background:var(--soft);border:1px solid #d8e4dd;display:grid;place-items:center;color:var(--green);font-weight:900;font-size:30px;flex:0 0 auto}
-.logo img{width:100%;height:100%;object-fit:contain;padding:8px;background:#fff}
-.card-tools{display:flex;align-items:center;gap:2px}.drag-handle,.more{border:0;background:transparent;color:#98a59f;padding:3px 5px}.drag-handle{font-size:17px;cursor:grab}.drag-handle:active{cursor:grabbing}.more{font-size:17px}
-.card h3{font-size:15px;line-height:1.22;margin:13px 0 4px;letter-spacing:-.01em}
-.desc{font-size:10px;line-height:1.4;color:var(--muted);margin:0;max-width:95%;min-height:28px}
-.bottom{margin-top:auto;padding-top:14px;display:flex;justify-content:flex-end}.open{text-decoration:none;color:var(--green);font-size:11px;font-weight:750;border:1px solid #c5d7cd;background:#fff;padding:7px 10px;border-radius:9px}.open:hover{background:var(--green);color:#fff;border-color:var(--green)}
-.menu{position:absolute;right:14px;top:47px;z-index:5;display:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 14px 35px rgba(31,90,68,.12)}.menu.show{display:grid}.menu button{border:0;background:transparent;color:var(--text);text-align:left;padding:8px 11px;border-radius:8px;font-size:12px;min-width:110px}.menu button:hover{background:#f1f5f3}.menu .delete{color:var(--danger)}
-.empty{display:none;border:1px dashed #cbd8d1;border-radius:16px;padding:44px 20px;text-align:center;color:var(--muted);background:#fff}.empty.show{display:block}
-.backdrop{position:fixed;inset:0;background:rgba(21,48,39,.28);display:none;z-index:20}.backdrop.show{display:block}
-.drawer{position:fixed;right:0;top:0;width:min(420px,100%);height:100vh;z-index:21;background:#f9fbfa;border-left:1px solid var(--line);box-shadow:-24px 0 55px rgba(31,90,68,.12);padding:22px;overflow:auto;transform:translateX(105%);transition:.22s}.drawer.show{transform:translateX(0)}
-.drawer-head{display:flex;align-items:center;justify-content:space-between}.drawer h2{margin:0;font-size:21px}.close{border:0;background:transparent;color:#7e8c85;font-size:27px}
-.form{display:grid;gap:15px;margin-top:22px}.field label{display:block;font-weight:750;margin-bottom:7px;font-size:13px}.field input,.field select{width:100%;background:#fff;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}.field input:focus,.field select:focus{border-color:#9db9aa;box-shadow:0 0 0 3px rgba(31,90,68,.06)}
-.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.type-btn{border:1px solid var(--line);background:#fff;color:#6d7b74;border-radius:10px;padding:10px;font-size:12px;font-weight:750}.type-btn.active{border-color:#9fbdad;color:var(--green);background:var(--soft)}
-.dropzone{border:1px dashed #b9cbc1;border-radius:13px;padding:20px;text-align:center;color:var(--muted);background:#fff;font-size:12px}.dropzone strong{display:block;color:var(--text);margin:5px 0;font-size:13px}.dropzone input{display:none}
-.preview{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff;display:flex;align-items:center;gap:12px}.preview .logo{width:76px;height:76px;border-radius:17px}.preview strong{display:block;font-size:13px}.preview small{color:var(--muted);font-size:11px}
-.drawer-actions{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:2px}.ghost{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:10px 12px;font-size:12px;font-weight:750}.primary-action{border:1px solid var(--green);background:var(--green);color:#fff;border-radius:10px;padding:10px 13px;font-size:12px;font-weight:750}
-.settings-box{display:grid;gap:16px}.settings-note{font-size:11px;line-height:1.5;color:var(--muted);margin-top:-4px}.setting-actions{display:grid;gap:8px}.setting-actions button{width:100%;text-align:left;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:11px 12px;font-size:12px}.setting-actions button:hover{background:#f3f7f5}.setting-actions .danger{color:var(--danger)}
-@media(max-width:1120px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:820px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shell{width:min(100% - 24px,1380px)}}
-@media(max-width:560px){.grid{grid-template-columns:1fr}.brand{font-size:19px}.btn{padding:10px 12px}.logo{width:104px;height:104px}}
+  :root {
+    --green:#1f5c45;
+    --green-2:#2f7a5d;
+    --text:#ffffff;
+    --shadow:0 10px 30px rgba(0,0,0,.28);
+    --glass:rgba(255,255,255,.16);
+    --glass-strong:rgba(255,255,255,.22);
+    --glass-line:rgba(255,255,255,.28);
+  }
+  *{box-sizing:border-box}
+  html,body{width:100%;height:100%;margin:0;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif}
+  body{
+    background:
+      radial-gradient(circle at 20% 10%, rgba(88,144,116,.38), transparent 28%),
+      radial-gradient(circle at 80% 0%, rgba(112,155,194,.30), transparent 30%),
+      linear-gradient(135deg,#16372e 0%,#102a24 48%,#173b31 100%);
+    color:var(--text);
+    user-select:none;
+  }
+  #wallpaper{position:fixed;inset:0;background-position:center;background-size:cover;background-repeat:no-repeat;z-index:-3}
+  #wallpaper::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,18,14,.08),rgba(5,18,14,.26));pointer-events:none}
+
+  .topbar{
+    position:fixed;top:18px;left:22px;right:22px;height:54px;display:flex;align-items:center;justify-content:space-between;z-index:1000;
+  }
+  .brand{font-size:18px;font-weight:700;letter-spacing:-.02em;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+  .actions{display:flex;gap:10px}
+  .top-btn{
+    border:1px solid var(--glass-line);background:rgba(15,34,28,.48);backdrop-filter:blur(18px) saturate(130%);-webkit-backdrop-filter:blur(18px) saturate(130%);
+    color:white;height:40px;padding:0 15px;border-radius:13px;font-weight:650;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.14);transition:.18s ease;
+  }
+  .top-btn:hover{transform:translateY(-1px);background:rgba(31,92,69,.72)}
+  .top-btn.primary{background:rgba(31,92,69,.78)}
+
+  #desktop{position:fixed;inset:0;padding-top:86px;z-index:1}
+  .app-icon{
+    position:absolute;width:106px;min-height:118px;padding:7px 6px 8px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;cursor:default;touch-action:none;
+    transition:background .15s ease,box-shadow .15s ease;
+  }
+  .app-icon:hover{background:rgba(255,255,255,.10);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  .app-icon.dragging{opacity:.86;transform:scale(1.03);z-index:900;background:rgba(255,255,255,.13)}
+  .app-logo{
+    width:78px;height:78px;border-radius:20px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+    background:rgba(255,255,255,.92);box-shadow:0 9px 22px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.55)
+  }
+  .app-logo img{width:100%;height:100%;object-fit:contain;padding:8px;pointer-events:none}
+  .app-logo .fallback{font-size:28px;font-weight:800;color:var(--green)}
+  .app-name{
+    width:100%;text-align:center;font-size:12px;line-height:1.18;font-weight:600;color:white;text-shadow:0 2px 8px rgba(0,0,0,.85);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  }
+
+  .calendar-widget{
+    position:absolute;left:calc(100% - 430px);top:98px;width:390px;height:510px;min-width:300px;min-height:280px;max-width:760px;max-height:calc(100vh - 120px);
+    border:1px solid var(--glass-line);border-radius:24px;background:rgba(250,252,250,.90);box-shadow:0 18px 55px rgba(0,0,0,.28);overflow:hidden;resize:both;z-index:700;
+  }
+  .calendar-widget.hidden{display:none}
+  .calendar-head{height:48px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;background:rgba(19,66,50,.93);color:white;cursor:move;touch-action:none}
+  .calendar-head strong{font-size:13px;letter-spacing:.01em}
+  .calendar-tools{display:flex;gap:7px}
+  .calendar-tools button{border:0;background:rgba(255,255,255,.12);color:white;border-radius:9px;width:30px;height:30px;cursor:pointer;font-size:15px}
+  .calendar-body{height:calc(100% - 48px);background:#fff}
+  .calendar-body iframe{width:100%;height:100%;border:0;display:block;background:white}
+  .calendar-empty{height:100%;display:flex;align-items:center;justify-content:center;padding:28px;text-align:center;color:#52655e;font-size:13px;line-height:1.5;background:linear-gradient(180deg,#fff,#f5f8f6)}
+  .calendar-empty button{margin-top:14px;border:0;background:var(--green);color:white;padding:10px 13px;border-radius:10px;font-weight:700;cursor:pointer}
+
+  .modal-backdrop{position:fixed;inset:0;background:rgba(5,15,12,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:3000;padding:18px}
+  .modal-backdrop.show{display:flex}
+  .modal{
+    width:min(520px,100%);max-height:min(760px,calc(100vh - 36px));overflow:auto;border:1px solid rgba(255,255,255,.18);border-radius:26px;background:rgba(245,249,247,.96);color:#17362b;box-shadow:0 28px 80px rgba(0,0,0,.35);padding:24px;
+  }
+  .modal h2{margin:0 0 5px;font-size:22px}
+  .modal .sub{margin:0 0 22px;color:#6b7b74;font-size:13px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;font-weight:750;margin-bottom:7px;color:#315044}
+  .field input,.field select{width:100%;height:44px;border:1px solid #d8e2dd;background:white;border-radius:12px;padding:0 12px;font-size:14px;outline:none;color:#183a2f}
+  .field input:focus,.field select:focus{border-color:#7fb39e;box-shadow:0 0 0 3px rgba(47,122,93,.10)}
+  .upload{border:1px dashed #a8bbb2;border-radius:15px;padding:17px;text-align:center;background:#f8faf9;color:#65776f;font-size:12px;cursor:pointer}
+  .upload strong{display:block;color:#2c5042;margin-bottom:4px;font-size:13px}
+  .thumb{width:68px;height:68px;border-radius:18px;margin:0 auto 10px;background:white;border:1px solid #e0e8e4;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:contain;padding:7px}
+  .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:22px}
+  .btn{height:42px;padding:0 15px;border-radius:11px;border:1px solid #d9e2de;background:white;color:#28493c;font-weight:700;cursor:pointer}
+  .btn.primary{border-color:var(--green);background:var(--green);color:white}
+  .settings-row{padding:14px 0;border-bottom:1px solid #e2e9e5}
+  .settings-row:first-of-type{padding-top:0}
+  .settings-row:last-of-type{border-bottom:0}
+  .settings-row h3{font-size:13px;margin:0 0 8px}
+  .settings-row p{font-size:12px;color:#6a7c74;margin:0 0 10px;line-height:1.45}
+  .row-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .switch-line{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .switch{appearance:none;width:46px;height:26px;border-radius:999px;background:#c9d5d0;position:relative;cursor:pointer;transition:.18s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 2px 6px rgba(0,0,0,.18);transition:.18s}
+  .switch:checked{background:var(--green)}
+  .switch:checked::after{left:23px}
+  .danger{color:#9b2f2f;border-color:#e7c7c7;background:#fffafa}
+  .context-menu{position:fixed;display:none;min-width:150px;background:rgba(248,251,249,.98);border:1px solid #dce6e1;border-radius:13px;padding:6px;box-shadow:0 18px 38px rgba(0,0,0,.25);z-index:5000;color:#203e33}
+  .context-menu.show{display:block}
+  .context-menu button{width:100%;border:0;background:transparent;text-align:left;padding:10px 11px;border-radius:9px;color:#26463a;cursor:pointer;font-size:13px}
+  .context-menu button:hover{background:#edf4f0}
+  .context-menu .delete{color:#a13f3f}
+
+  @media (max-width:760px){
+    .topbar{left:14px;right:14px;top:12px}.brand{font-size:16px}.top-btn{padding:0 11px}.calendar-widget{left:14px!important;right:14px;width:auto!important;height:48vh;top:auto!important;bottom:14px}.app-logo{width:70px;height:70px}.app-icon{width:96px}}
 </style>
 </head>
 <body>
-<div class="shell">
-  <header class="topbar">
-    <div class="brand">Mytoolapp</div>
-    <div class="actions">
-      <button class="btn" id="settingsBtn">Réglages</button>
-      <button class="btn primary" id="addBtn">+ Ajouter</button>
+<div id="wallpaper"></div>
+<header class="topbar">
+  <div class="brand">Mytoolapp</div>
+  <div class="actions">
+    <button class="top-btn" id="settingsBtn">⚙ Réglages</button>
+    <button class="top-btn primary" id="addBtn">＋ Ajouter</button>
+  </div>
+</header>
+<main id="desktop"></main>
+
+<section id="calendarWidget" class="calendar-widget">
+  <div class="calendar-head" id="calendarDrag">
+    <strong>Google Agenda</strong>
+    <div class="calendar-tools"><button id="calendarRefresh" title="Recharger">↻</button><button id="calendarHide" title="Masquer">×</button></div>
+  </div>
+  <div class="calendar-body" id="calendarBody"></div>
+</section>
+
+<div class="modal-backdrop" id="addModal">
+  <div class="modal">
+    <h2>Ajouter une application</h2>
+    <p class="sub">Nom, lien, logo. C’est tout.</p>
+    <div class="field"><label>Nom</label><input id="appName" placeholder="Ex. : Google Sheets" /></div>
+    <div class="field"><label>Lien</label><input id="appLink" placeholder="https://..." /></div>
+    <div class="field">
+      <label>Logo</label>
+      <div class="upload" id="logoUpload"><div class="thumb" id="logoPreview"><span style="font-size:24px;color:#1f5c45;font-weight:800">A</span></div><strong>Choisir une image</strong>PNG, JPG, WEBP ou SVG</div>
+      <input id="logoFile" type="file" accept="image/*,.svg" hidden />
     </div>
-  </header>
-  <main>
-    <section class="grid" id="grid"></section>
-    <div class="empty" id="empty">Aucune application.</div>
-  </main>
+    <div class="modal-actions"><button class="btn" data-close="addModal">Annuler</button><button class="btn primary" id="createApp">Ajouter</button></div>
+  </div>
 </div>
 
-<div class="backdrop" id="backdrop"></div>
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal">
+    <h2>Réglages</h2>
+    <p class="sub">Personnalise ton bureau Mytoolapp.</p>
 
-<aside class="drawer" id="appDrawer">
-  <div class="drawer-head"><h2 id="drawerTitle">Ajouter une application</h2><button class="close" data-close>×</button></div>
-  <div class="form">
-    <div class="field"><label>Type</label><div class="type-row"><button class="type-btn active" data-type="internal">Outil interne</button><button class="type-btn" data-type="public">Site public</button></div></div>
-    <div class="field"><label>Nom</label><input id="appName" placeholder="Ex. : Google Drive" maxlength="70" /></div>
-    <div class="field"><label>Lien</label><input id="appLink" type="url" placeholder="https://..." /></div>
-    <div class="field"><label>Logo</label><label class="dropzone" for="logoFile"><div style="font-size:23px">＋</div><strong>Choisir un logo</strong><span>PNG, JPG, WEBP ou SVG</span><input id="logoFile" type="file" accept="image/*,.svg" /></label></div>
-    <div class="field"><label>Description <span style="color:var(--muted);font-weight:500">(facultatif)</span></label><input id="appDesc" placeholder="Courte description" maxlength="150" /></div>
-    <div class="field"><label>Aperçu</label><div class="preview"><div class="logo" id="previewLogo">A</div><div><strong id="previewName">Mon application</strong><small id="previewType">Outil interne</small></div></div></div>
-    <div class="drawer-actions"><button class="primary-action" id="saveApp">Créer</button><button class="ghost" data-close>Annuler</button></div>
-  </div>
-</aside>
+    <div class="settings-row">
+      <h3>Fond d’écran</h3>
+      <p>Choisis n’importe quelle image depuis ton Mac. Elle est conservée localement dans ce navigateur.</p>
+      <div class="row-actions"><button class="btn" id="wallpaperBtn">Choisir une image</button><button class="btn" id="wallpaperClear">Retirer l’image</button></div>
+      <input id="wallpaperFile" type="file" accept="image/*" hidden />
+    </div>
 
-<aside class="drawer" id="settingsDrawer">
-  <div class="drawer-head"><h2>Réglages</h2><button class="close" data-close>×</button></div>
-  <div class="form settings-box">
-    <div class="field">
-      <label for="sort">Ordre des tuiles</label>
-      <select id="sort">
-        <option value="custom">Ordre personnalisé</option>
-        <option value="name-asc">Nom A → Z</option>
-        <option value="name-desc">Nom Z → A</option>
-      </select>
-      <div class="settings-note">Tu peux aussi déplacer les tuiles directement avec la poignée ⋮⋮. Cela repasse automatiquement en ordre personnalisé.</div>
+    <div class="settings-row">
+      <div class="switch-line"><div><h3>Afficher Google Agenda</h3><p style="margin:0">Affiche ou masque le widget Agenda.</p></div><input class="switch" type="checkbox" id="calendarToggle" /></div>
     </div>
-    <div class="setting-actions">
-      <button id="resetOrder">Réinitialiser l’ordre</button>
-      <button id="resetAll" class="danger">Réinitialiser Mytoolapp</button>
+
+    <div class="settings-row">
+      <h3>Lien d’intégration Google Agenda</h3>
+      <p>Colle l’URL d’intégration fournie par Google Agenda dans « Intégrer l’agenda ».</p>
+      <div class="field" style="margin:0"><input id="calendarUrl" placeholder="https://calendar.google.com/calendar/embed?..." /></div>
+      <div class="row-actions" style="margin-top:9px"><button class="btn" id="saveCalendar">Enregistrer l’agenda</button></div>
     </div>
+
+    <div class="settings-row">
+      <h3>Disposition des icônes</h3>
+      <p>Tu peux déplacer librement chaque icône à la souris. Ce bouton les réaligne automatiquement.</p>
+      <div class="row-actions"><button class="btn" id="autoArrange">Aligner automatiquement</button></div>
+    </div>
+
+    <div class="settings-row">
+      <h3>Données</h3>
+      <div class="row-actions"><button class="btn" id="exportBtn">Exporter</button><button class="btn" id="importBtn">Importer</button><button class="btn danger" id="resetBtn">Réinitialiser</button></div>
+      <input id="importFile" type="file" accept="application/json" hidden />
+    </div>
+
+    <div class="modal-actions"><button class="btn primary" data-close="settingsModal">Fermer</button></div>
   </div>
-</aside>
+</div>
+
+<div class="context-menu" id="contextMenu"><button id="openContext">Ouvrir</button><button id="editContext">Modifier</button><button class="delete" id="deleteContext">Supprimer</button></div>
 
 <script>
-const DEFAULT_APPS=[
-{id:'gen',name:'Générateur Prestaterre',link:'#',type:'internal',description:'Création et export des slides et indicateurs Prestaterre.',logo:'',createdAt:1},
-{id:'siap',name:'Rapprochement SIAP',link:'#',type:'internal',description:'Rapprochement multi-critères avec les données SIAP.',logo:'',createdAt:2},
-{id:'sheets',name:'Google Sheets',link:'https://docs.google.com/spreadsheets/',type:'public',description:'Feuilles de calcul et tableaux partagés.',logo:'',createdAt:3},
-{id:'drive',name:'Google Drive',link:'https://drive.google.com/',type:'public',description:'Stockage et partage de fichiers.',logo:'',createdAt:4},
-{id:'chatgpt',name:'ChatGPT',link:'https://chatgpt.com/',type:'public',description:'Assistant IA pour l’analyse, la rédaction et la création.',logo:'',createdAt:5},
-{id:'odoo',name:'Odoo',link:'https://www.odoo.com/',type:'public',description:'Suite d’applications de gestion d’entreprise.',logo:'',createdAt:6}
+const STORAGE_KEY='mytoolapp.desktop.v1';
+const DB_NAME='mytoolapp-assets'; const DB_STORE='assets';
+const desktop=document.getElementById('desktop');
+const addModal=document.getElementById('addModal'); const settingsModal=document.getElementById('settingsModal');
+const contextMenu=document.getElementById('contextMenu');
+let contextAppId=null; let pendingLogo='';
+
+const defaultApps=[
+ {id:'chatgpt',name:'ChatGPT',link:'https://chatgpt.com/',logo:'https://www.google.com/s2/favicons?domain=chatgpt.com&sz=128',x:28,y:102},
+ {id:'sheets',name:'Google Sheets',link:'https://docs.google.com/spreadsheets/',logo:'https://www.google.com/s2/favicons?domain=docs.google.com&sz=128',x:142,y:102},
+ {id:'drive',name:'Google Drive',link:'https://drive.google.com/',logo:'https://www.google.com/s2/favicons?domain=drive.google.com&sz=128',x:256,y:102},
+ {id:'odoo',name:'Odoo',link:'https://www.odoo.com/',logo:'https://www.google.com/s2/favicons?domain=odoo.com&sz=128',x:370,y:102},
+ {id:'pulpo',name:'Pulpo Mobile',link:'https://cedriccovarel.github.io/pulpomobile/',logo:'',x:28,y:230}
 ];
-const STORE='prestaterre_toolbox_minimal_v1', SORT_STORE='mytoolapp_sort_v1';
-let apps=[],sortMode=localStorage.getItem(SORT_STORE)||'custom',currentType='internal',editingId=null,uploadedLogo='',dragId=null;
-const $=id=>document.getElementById(id);
-const esc=s=>String(s||'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
-function initials(n){return (n||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'A'}
-function safeUrl(u){try{const x=new URL(u);return ['http:','https:'].includes(x.protocol)?x.href:'#'}catch(e){return '#'}}
-function load(){try{const v=JSON.parse(localStorage.getItem(STORE)||'null');apps=Array.isArray(v)&&v.length?v:DEFAULT_APPS.map(x=>({...x}))}catch(e){apps=DEFAULT_APPS.map(x=>({...x}))}$('sort').value=sortMode;render()}
-function persist(){localStorage.setItem(STORE,JSON.stringify(apps))}
-function logoHtml(a){return a.logo?`<img src="${a.logo}" alt="">`:esc(initials(a.name))}
-function currentList(){const list=apps.slice();if(sortMode==='name-asc')list.sort((a,b)=>a.name.localeCompare(b.name,'fr'));if(sortMode==='name-desc')list.sort((a,b)=>b.name.localeCompare(a.name,'fr'));return list}
-function render(){const list=currentList();$('grid').innerHTML=list.map(a=>`<article class="card" data-id="${esc(a.id)}"><div class="card-top"><div class="logo">${logoHtml(a)}</div><div class="card-tools"><button class="drag-handle" draggable="true" title="Déplacer">⋮⋮</button><button class="more" title="Options">•••</button></div></div><h3>${esc(a.name)}</h3><p class="desc">${esc(a.description||'')}</p><div class="bottom"><a class="open" href="${safeUrl(a.link)}" target="_blank" rel="noopener noreferrer">Ouvrir ↗</a></div><div class="menu"><button class="edit">Modifier</button><button class="delete">Supprimer</button></div></article>`).join('');$('empty').classList.toggle('show',!list.length);bindDrag()}
-function bindDrag(){document.querySelectorAll('.card').forEach(card=>{const handle=card.querySelector('.drag-handle');handle.addEventListener('dragstart',e=>{dragId=card.dataset.id;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',dragId)});handle.addEventListener('dragend',()=>{card.classList.remove('dragging');document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));dragId=null});card.addEventListener('dragover',e=>{if(!dragId||dragId===card.dataset.id)return;e.preventDefault();card.classList.add('drag-over')});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');const targetId=card.dataset.id;if(!dragId||dragId===targetId)return;reorder(dragId,targetId);dragId=null})})}
-function reorder(sourceId,targetId){const ids=apps.map(a=>a.id),s=ids.indexOf(sourceId),t=ids.indexOf(targetId);if(s<0||t<0)return;const [moved]=apps.splice(s,1);apps.splice(t,0,moved);sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);$('sort').value=sortMode;persist();render()}
-function showDrawer(drawer){$('backdrop').classList.add('show');drawer.classList.add('show')}
-function closeDrawers(){$('backdrop').classList.remove('show');document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('show'));editingId=null;uploadedLogo=''}
-function openAppDrawer(a=null){editingId=a?.id||null;currentType=a?.type||'internal';uploadedLogo=a?.logo||'';$('drawerTitle').textContent=a?'Modifier l’application':'Ajouter une application';$('saveApp').textContent=a?'Enregistrer':'Créer';$('appName').value=a?.name||'';$('appLink').value=a?.link||'';$('appDesc').value=a?.description||'';$('logoFile').value='';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentType));updatePreview();showDrawer($('appDrawer'));setTimeout(()=>$('appName').focus(),100)}
-function updatePreview(){const n=$('appName').value.trim()||'Mon application';$('previewName').textContent=n;$('previewType').textContent=currentType==='public'?'Site public':'Outil interne';$('previewLogo').innerHTML=uploadedLogo?`<img src="${uploadedLogo}" alt="">`:initials(n)}
-function saveApp(){const name=$('appName').value.trim(),link=$('appLink').value.trim(),description=$('appDesc').value.trim();if(!name){alert('Indique le nom de l’application.');return}if(safeUrl(link)==='#'){alert('Indique un lien valide commençant par https://');return}if(editingId){const i=apps.findIndex(a=>a.id===editingId);if(i>=0)apps[i]={...apps[i],name,link:safeUrl(link),type:currentType,description,logo:uploadedLogo}}else apps.push({id:'app-'+Date.now(),name,link:safeUrl(link),type:currentType,description,logo:uploadedLogo,createdAt:Date.now()});persist();sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);$('sort').value=sortMode;render();closeDrawers()}
-$('addBtn').onclick=()=>openAppDrawer();$('settingsBtn').onclick=()=>showDrawer($('settingsDrawer'));$('backdrop').onclick=closeDrawers;document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeDrawers);
-document.querySelectorAll('.type-btn').forEach(b=>b.onclick=()=>{currentType=b.dataset.type;document.querySelectorAll('.type-btn').forEach(x=>x.classList.toggle('active',x===b));updatePreview()});$('appName').oninput=updatePreview;$('saveApp').onclick=saveApp;
-$('logoFile').onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>2.5*1024*1024){alert('Choisis un logo de moins de 2,5 Mo.');return}const r=new FileReader();r.onload=()=>{uploadedLogo=r.result;updatePreview()};r.readAsDataURL(f)};
-$('sort').onchange=e=>{sortMode=e.target.value;localStorage.setItem(SORT_STORE,sortMode);render()};
-$('resetOrder').onclick=()=>{apps.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);$('sort').value=sortMode;persist();render();closeDrawers()};
-$('resetAll').onclick=()=>{if(confirm('Réinitialiser toutes les applications et l’ordre ?')){apps=DEFAULT_APPS.map(x=>({...x}));sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);persist();render();closeDrawers()}};
-$('grid').onclick=e=>{const card=e.target.closest('.card');if(!card)return;const a=apps.find(x=>x.id===card.dataset.id);if(!a)return;if(e.target.closest('.more')){card.querySelector('.menu').classList.toggle('show');return}if(e.target.closest('.edit')){openAppDrawer(a);return}if(e.target.closest('.delete')){if(confirm(`Supprimer “${a.name}” ?`)){apps=apps.filter(x=>x.id!==a.id);persist();render()}return}};
-document.addEventListener('click',e=>{if(!e.target.closest('.more'))document.querySelectorAll('.menu').forEach(m=>m.classList.remove('show'))});
-load();
+
+function getState(){
+ try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw)}catch(e){}
+ return {apps:defaultApps,calendar:{visible:true,url:'',x:null,y:98,w:390,h:510}};
+}
+let state=getState();
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(DB_STORE))req.result.createObjectStore(DB_STORE)};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function dbSet(k,v){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(DB_STORE,'readwrite');tx.objectStore(DB_STORE).put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
+async function dbGet(k){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(DB_STORE).objectStore(DB_STORE).get(k);r.onsuccess=()=>res(r.result||'');r.onerror=()=>rej(r.error)})}
+async function dbDel(k){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(DB_STORE,'readwrite');tx.objectStore(DB_STORE).delete(k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
+
+function escapeHTML(s){return String(s||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function initials(name){return (name||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
+
+function renderApps(){
+ desktop.querySelectorAll('.app-icon').forEach(e=>e.remove());
+ state.apps.forEach((app,i)=>{
+   const el=document.createElement('div'); el.className='app-icon'; el.dataset.id=app.id; el.style.left=(app.x??28)+'px'; el.style.top=(app.y??(102+i*128))+'px';
+   const logo=app.logo?`<img src="${escapeHTML(app.logo)}" alt="">`:`<span class="fallback">${escapeHTML(initials(app.name))}</span>`;
+   el.innerHTML=`<div class="app-logo">${logo}</div><div class="app-name">${escapeHTML(app.name)}</div>`;
+   el.addEventListener('dblclick',()=>window.open(app.link,'_blank','noopener'));
+   el.addEventListener('contextmenu',e=>{e.preventDefault();contextAppId=app.id;showContext(e.clientX,e.clientY)});
+   makeDraggable(el,app);
+   desktop.appendChild(el);
+ });
+}
+
+function makeDraggable(el,app){
+ let dragging=false, moved=false, ox=0,oy=0,startX=0,startY=0;
+ el.addEventListener('pointerdown',e=>{
+   if(e.button!==0)return; dragging=true;moved=false;startX=e.clientX;startY=e.clientY;ox=e.clientX-el.offsetLeft;oy=e.clientY-el.offsetTop;el.setPointerCapture(e.pointerId);el.classList.add('dragging');
+ });
+ el.addEventListener('pointermove',e=>{
+   if(!dragging)return; if(Math.hypot(e.clientX-startX,e.clientY-startY)>4)moved=true;
+   const maxX=window.innerWidth-el.offsetWidth; const maxY=window.innerHeight-el.offsetHeight;
+   el.style.left=Math.max(0,Math.min(maxX,e.clientX-ox))+'px'; el.style.top=Math.max(78,Math.min(maxY,e.clientY-oy))+'px';
+ });
+ el.addEventListener('pointerup',e=>{
+   if(!dragging)return; dragging=false;el.classList.remove('dragging');app.x=parseInt(el.style.left)||0;app.y=parseInt(el.style.top)||0;saveState();
+   if(!moved && e.detail===1){/* single click selection intentionally minimal */}
+ });
+}
+
+function autoArrange(){
+ const usableW=Math.max(320,window.innerWidth-(state.calendar?.visible?440:30)); const cellW=114,cellH=128; const cols=Math.max(1,Math.floor((usableW-24)/cellW));
+ state.apps.forEach((a,i)=>{a.x=24+(i%cols)*cellW;a.y=98+Math.floor(i/cols)*cellH});saveState();renderApps();
+}
+
+function showContext(x,y){contextMenu.style.left=Math.min(x,window.innerWidth-165)+'px';contextMenu.style.top=Math.min(y,window.innerHeight-130)+'px';contextMenu.classList.add('show')}
+function hideContext(){contextMenu.classList.remove('show')}
+document.addEventListener('click',e=>{if(!contextMenu.contains(e.target))hideContext()});
+
+function showModal(el){el.classList.add('show')}
+function hideModal(el){el.classList.remove('show')}
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>hideModal(document.getElementById(b.dataset.close))));
+[addModal,settingsModal].forEach(m=>m.addEventListener('mousedown',e=>{if(e.target===m)hideModal(m)}));
+
+addBtn.onclick=()=>{pendingLogo='';appName.value='';appLink.value='';logoPreview.innerHTML='<span style="font-size:24px;color:#1f5c45;font-weight:800">A</span>';showModal(addModal)};
+settingsBtn.onclick=()=>{syncSettings();showModal(settingsModal)};
+
+logoUpload.onclick=()=>logoFile.click();
+logoFile.onchange=()=>{const f=logoFile.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{pendingLogo=r.result;logoPreview.innerHTML=`<img src="${pendingLogo}">`};r.readAsDataURL(f)};
+appName.addEventListener('input',()=>{if(!pendingLogo)logoPreview.innerHTML=`<span style="font-size:24px;color:#1f5c45;font-weight:800">${escapeHTML(initials(appName.value))}</span>`});
+createApp.onclick=()=>{
+ const name=appName.value.trim(),link=appLink.value.trim(); if(!name||!link){alert('Ajoute un nom et un lien.');return}
+ let url=link; if(!/^https?:\/\//i.test(url))url='https://'+url;
+ const id='app-'+Date.now(); state.apps.push({id,name,link:url,logo:pendingLogo,x:24,y:98});autoArrange();hideModal(addModal);
+};
+
+function editApp(app){
+ const name=prompt('Nom de l’application',app.name); if(name===null)return; const link=prompt('Lien',app.link); if(link===null)return;app.name=name.trim()||app.name;app.link=link.trim()||app.link;saveState();renderApps();
+}
+openContext.onclick=()=>{const a=state.apps.find(x=>x.id===contextAppId);if(a)window.open(a.link,'_blank','noopener');hideContext()};
+editContext.onclick=()=>{const a=state.apps.find(x=>x.id===contextAppId);if(a)editApp(a);hideContext()};
+deleteContext.onclick=()=>{const a=state.apps.find(x=>x.id===contextAppId);if(a&&confirm(`Supprimer ${a.name} ?`)){state.apps=state.apps.filter(x=>x.id!==a.id);saveState();renderApps()}hideContext()};
+
+async function applyWallpaper(){const data=await dbGet('wallpaper');document.getElementById('wallpaper').style.backgroundImage=data?`url(${data})`:''}
+wallpaperBtn.onclick=()=>wallpaperFile.click();
+wallpaperFile.onchange=async()=>{const f=wallpaperFile.files[0];if(!f)return;const data=await resizeImage(f,1920,1080,.88);await dbSet('wallpaper',data);await applyWallpaper()};
+wallpaperClear.onclick=async()=>{await dbDel('wallpaper');await applyWallpaper()};
+function resizeImage(file,maxW,maxH,quality){return new Promise(resolve=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxW/img.width,maxH/img.height);const c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',quality))};img.src=r.result};r.readAsDataURL(file)})}
+
+const cal=document.getElementById('calendarWidget'),calBody=document.getElementById('calendarBody');
+function renderCalendar(){
+ const c=state.calendar||{visible:true,url:'',x:null,y:98,w:390,h:510};state.calendar=c;
+ cal.classList.toggle('hidden',!c.visible);cal.style.width=(c.w||390)+'px';cal.style.height=(c.h||510)+'px';cal.style.top=(c.y||98)+'px';
+ if(c.x===null||c.x===undefined){cal.style.left=(window.innerWidth-(c.w||390)-30)+'px'}else cal.style.left=c.x+'px';
+ if(c.url){calBody.innerHTML=`<iframe src="${escapeHTML(c.url)}" loading="lazy"></iframe>`}else calBody.innerHTML=`<div class="calendar-empty"><div><strong>Google Agenda</strong><br>Ajoute ton lien d’intégration dans Réglages pour afficher directement ton agenda ici.<br><button onclick="settingsBtn.click()">Configurer</button></div></div>`;
+}
+calendarHide.onclick=()=>{state.calendar.visible=false;saveState();renderCalendar()};
+calendarRefresh.onclick=()=>renderCalendar();
+calendarToggle.onchange=()=>{state.calendar.visible=calendarToggle.checked;saveState();renderCalendar()};
+saveCalendar.onclick=()=>{state.calendar.url=calendarUrl.value.trim();saveState();renderCalendar()};
+
+function makeWidgetDraggable(){
+ const handle=document.getElementById('calendarDrag');let drag=false,ox=0,oy=0;
+ handle.addEventListener('pointerdown',e=>{if(e.target.tagName==='BUTTON')return;drag=true;ox=e.clientX-cal.offsetLeft;oy=e.clientY-cal.offsetTop;handle.setPointerCapture(e.pointerId)});
+ handle.addEventListener('pointermove',e=>{if(!drag)return;cal.style.left=Math.max(0,Math.min(window.innerWidth-cal.offsetWidth,e.clientX-ox))+'px';cal.style.top=Math.max(78,Math.min(window.innerHeight-cal.offsetHeight,e.clientY-oy))+'px'});
+ handle.addEventListener('pointerup',()=>{if(!drag)return;drag=false;state.calendar.x=parseInt(cal.style.left)||0;state.calendar.y=parseInt(cal.style.top)||98;state.calendar.w=cal.offsetWidth;state.calendar.h=cal.offsetHeight;saveState()});
+ const ro=new ResizeObserver(()=>{if(cal.offsetParent!==null){state.calendar.w=cal.offsetWidth;state.calendar.h=cal.offsetHeight;clearTimeout(window.__calResizeTimer);window.__calResizeTimer=setTimeout(saveState,180)}});ro.observe(cal);
+}
+
+function syncSettings(){calendarToggle.checked=state.calendar?.visible!==false;calendarUrl.value=state.calendar?.url||''}
+autoArrangeBtn=document.getElementById('autoArrange');autoArrangeBtn.onclick=autoArrange;
+
+exportBtn.onclick=async()=>{
+ const payload={version:1,state,wallpaper:await dbGet('wallpaper')};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mytoolapp-config.json';a.click();URL.revokeObjectURL(a.href)
+};
+importBtn.onclick=()=>importFile.click();
+importFile.onchange=()=>{const f=importFile.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const p=JSON.parse(r.result);if(p.state)state=p.state;else state=p;if(p.wallpaper)await dbSet('wallpaper',p.wallpaper);saveState();renderApps();renderCalendar();await applyWallpaper();alert('Configuration importée.')}catch(e){alert('Fichier invalide.')}};r.readAsText(f)};
+resetBtn.onclick=async()=>{if(!confirm('Réinitialiser Mytoolapp ?'))return;localStorage.removeItem(STORAGE_KEY);await dbDel('wallpaper');state={apps:JSON.parse(JSON.stringify(defaultApps)),calendar:{visible:true,url:'',x:null,y:98,w:390,h:510}};saveState();renderApps();renderCalendar();await applyWallpaper()};
+
+window.addEventListener('resize',()=>{state.apps.forEach(a=>{a.x=Math.min(a.x??0,window.innerWidth-106);a.y=Math.min(a.y??98,window.innerHeight-118)});saveState();renderApps();renderCalendar()});
+
+renderApps();renderCalendar();makeWidgetDraggable();applyWallpaper();
 </script>
 </body>
 </html>

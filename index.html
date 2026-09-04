@@ -1,197 +1,144 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prestaterre Toolbox</title>
-  <meta name="theme-color" content="#07110f" />
-  <style>
-    :root{
-      --bg:#07110f;--bg2:#0b1714;--panel:#0f1f1b;--panel2:#122620;--line:rgba(255,255,255,.08);
-      --text:#eefcf7;--muted:#95aaa2;--green:#65ec9f;--cyan:#51c7ff;--yellow:#d7f054;--danger:#ff6b7a;
-      --shadow:0 18px 50px rgba(0,0,0,.35);--r:20px;--rs:14px;
-    }
-    *{box-sizing:border-box} html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:
-      radial-gradient(circle at 78% 8%,rgba(81,199,255,.10),transparent 28%),
-      radial-gradient(circle at 20% 20%,rgba(101,236,159,.08),transparent 25%),linear-gradient(180deg,#0a1714,var(--bg));color:var(--text)}
-    body{min-height:100vh;overflow-x:hidden}
-    button,input,select{font:inherit}
-    button{cursor:pointer}
-    .app-shell{display:grid;grid-template-columns:238px 1fr;min-height:100vh}
-    .sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);padding:18px 14px;background:rgba(5,14,12,.83);backdrop-filter:blur(16px);display:flex;flex-direction:column;z-index:5}
-    .brand{display:flex;gap:12px;align-items:center;padding:7px 8px 22px}.brand-mark{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--green),var(--cyan));display:grid;place-items:center;color:#042318;font-size:20px;font-weight:900;box-shadow:0 0 24px rgba(101,236,159,.2)}
-    .brand b{display:block;font-size:16px}.brand span{color:var(--green);font-size:13px;font-weight:700}
-    .nav{display:grid;gap:8px}.nav button{border:1px solid transparent;background:transparent;color:#b5c7c0;padding:13px 14px;border-radius:14px;text-align:left;display:flex;gap:12px;align-items:center;font-weight:650}.nav button.active{border-color:rgba(101,236,159,.25);background:linear-gradient(90deg,rgba(101,236,159,.16),rgba(81,199,255,.05));color:white;box-shadow:inset 3px 0 0 var(--green)}
-    .nav .ico{width:24px;text-align:center;font-size:17px}
-    .side-spacer{flex:1}.side-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.025);color:var(--muted);font-size:12px;line-height:1.5}.status{display:flex;align-items:center;gap:8px;color:var(--green);font-weight:700;margin:6px 0 12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
-    .content{min-width:0}.topbar{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:20px;padding:0 28px;background:rgba(5,14,12,.44);backdrop-filter:blur(12px);position:sticky;top:0;z-index:4}.top-title{font-weight:800;white-space:nowrap}.search{max-width:580px;flex:1;margin:auto;position:relative}.search input{width:100%;background:#0c1816;border:1px solid var(--line);border-radius:14px;padding:13px 16px 13px 42px;color:white;outline:none}.search:before{content:'⌕';position:absolute;left:15px;top:11px;color:#93a8a0;font-size:20px}.top-actions{display:flex;gap:10px;align-items:center}.ghost,.primary,.danger,.mini-btn{border-radius:12px;border:1px solid var(--line);padding:10px 13px;background:rgba(255,255,255,.035);color:white;font-weight:700}.primary{border:none;background:linear-gradient(135deg,var(--green),var(--cyan));color:#042018;box-shadow:0 8px 24px rgba(81,199,255,.18)}.danger{color:#ffdfe2;border-color:rgba(255,107,122,.25);background:rgba(255,107,122,.07)}
-    main{padding:28px;max-width:1500px;margin:auto}.headline{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:22px}.headline h1{margin:0;font-size:34px;letter-spacing:-.03em}.headline p{margin:7px 0 0;color:var(--muted)}
-    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.kpi{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(18,38,32,.86),rgba(10,22,19,.86));padding:17px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}.kpi-icon{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;font-size:22px;background:rgba(101,236,159,.09);border:1px solid rgba(101,236,159,.2)}.kpi:nth-child(2) .kpi-icon{background:rgba(81,199,255,.09);border-color:rgba(81,199,255,.2)}.kpi:nth-child(3) .kpi-icon{background:rgba(215,240,84,.08);border-color:rgba(215,240,84,.18)}.kpi strong{display:block;font-size:26px}.kpi span{color:var(--muted);font-size:12px}
-    .toolbar{display:flex;gap:12px;justify-content:space-between;align-items:center;margin:18px 0}.tabs{display:flex;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}.tabs button{border:0;background:transparent;color:#9fb2ab;border-radius:10px;padding:9px 16px}.tabs button.active{color:var(--green);background:rgba(101,236,159,.08)}.sort{display:flex;gap:8px}.sort select{background:#0c1816;color:white;border:1px solid var(--line);border-radius:12px;padding:9px 12px}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.card{position:relative;min-height:252px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(18,36,31,.96),rgba(9,20,17,.96));padding:18px;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:.18s transform,.18s border-color}.card:hover{transform:translateY(-3px);border-color:rgba(101,236,159,.22)}.card-head{display:flex;justify-content:space-between;gap:10px}.app-logo{width:62px;height:62px;border-radius:17px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,rgba(101,236,159,.85),rgba(81,199,255,.85));color:#032018;font-weight:900;font-size:24px;border:1px solid rgba(255,255,255,.13)}.app-logo img{width:100%;height:100%;object-fit:cover}.fav{border:0;background:transparent;color:#8ea098;font-size:20px;padding:2px}.fav.on{color:#f6e75a}.card h3{margin:14px 0 7px;font-size:19px}.desc{margin:0;color:#9fb0aa;font-size:13px;line-height:1.48;min-height:38px}.badges{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}.badge{font-size:11px;border-radius:999px;padding:6px 9px;border:1px solid rgba(101,236,159,.2);color:var(--green);background:rgba(101,236,159,.06)}.badge.public{color:#73cfff;border-color:rgba(81,199,255,.2);background:rgba(81,199,255,.06)}.card-actions{margin-top:auto;display:flex;gap:8px;padding-top:16px}.open{flex:1;text-decoration:none;text-align:center;color:white;border:1px solid var(--line);border-radius:12px;padding:10px;background:rgba(255,255,255,.025);font-weight:750}.more{width:42px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);color:white}.menu{position:absolute;right:16px;bottom:64px;background:#0c1715;border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:var(--shadow);display:none;z-index:3}.menu.show{display:grid}.menu button{min-width:120px;border:0;background:transparent;color:#dce9e4;text-align:left;padding:9px 10px;border-radius:8px}.menu button:hover{background:rgba(255,255,255,.05)}.menu button.delete{color:#ff9aa4}
-    .empty{display:none;text-align:center;color:var(--muted);padding:50px 20px;border:1px dashed var(--line);border-radius:20px}.empty.show{display:block}.hidden{display:none!important}
-    .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:20;display:none}.drawer-backdrop.show{display:block}.drawer{position:fixed;right:0;top:0;height:100vh;width:min(430px,100%);z-index:21;background:linear-gradient(180deg,#10201d,#0a1513);border-left:1px solid var(--line);box-shadow:-24px 0 60px rgba(0,0,0,.45);padding:22px;transform:translateX(105%);transition:.22s transform;overflow:auto}.drawer.show{transform:translateX(0)}.drawer-top{display:flex;justify-content:space-between;align-items:center}.drawer h2{margin:0;font-size:25px}.close{border:0;background:transparent;color:#aabcb5;font-size:26px}.form{display:grid;gap:16px;margin-top:22px}.field label{display:block;font-weight:750;margin-bottom:8px}.field input,.field select{width:100%;background:#0b1715;color:white;border:1px solid var(--line);border-radius:12px;padding:12px 13px;outline:none}.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.type-btn{border:1px solid var(--line);background:rgba(255,255,255,.025);color:#c5d3ce;border-radius:12px;padding:11px;font-weight:750}.type-btn.active{border-color:rgba(101,236,159,.35);color:var(--green);background:rgba(101,236,159,.07)}
-    .dropzone{border:1px dashed rgba(255,255,255,.18);border-radius:16px;padding:24px;text-align:center;background:rgba(255,255,255,.02);color:var(--muted)}.dropzone strong{display:block;color:white;margin:6px 0}.dropzone input{display:none}.preview{border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.025);display:flex;align-items:center;gap:12px}.preview .app-logo{width:54px;height:54px}.preview strong{display:block}.preview small{color:var(--muted)}.drawer-actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:8px}
-    .settings-panel{display:none;border:1px solid var(--line);border-radius:20px;padding:18px;background:rgba(255,255,255,.025);margin-top:20px}.settings-panel.show{display:block}.settings-panel h3{margin-top:0}.settings-actions{display:flex;flex-wrap:wrap;gap:10px}.file-import{display:none}
-    @media(max-width:1180px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:850px){.app-shell{grid-template-columns:1fr}.sidebar{display:none}.topbar{padding:0 14px}.top-title{display:none}main{padding:18px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.headline{align-items:start}.headline .primary{white-space:nowrap}}
-    @media(max-width:600px){.grid,.kpis{grid-template-columns:1fr}.headline{display:grid}.toolbar{align-items:stretch;flex-direction:column}.tabs{overflow:auto}.top-actions .ghost{display:none}.search{max-width:none}}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mytoolapp</title>
+<meta name="theme-color" content="#f4f7f5" />
+<style>
+:root{
+  --bg:#f4f7f5;
+  --panel:#fff;
+  --line:#dfe8e3;
+  --text:#19382e;
+  --muted:#7a8881;
+  --green:#1f5a44;
+  --green2:#2f715a;
+  --soft:#eaf2ed;
+  --danger:#b84f57;
+  --shadow:0 8px 24px rgba(31,90,68,.06);
+  --shadow2:0 14px 30px rgba(31,90,68,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit} button{cursor:pointer}
+.shell{width:min(1380px,calc(100% - 40px));margin:0 auto;padding:24px 0 54px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}
+.brand{font-size:21px;font-weight:800;letter-spacing:-.025em;color:var(--green)}
+.actions{display:flex;gap:9px;align-items:center}
+.btn{border-radius:11px;padding:11px 14px;font-size:13px;font-weight:750;border:1px solid var(--line);background:#fff;color:var(--text)}
+.btn:hover{border-color:#bfd0c7;background:#fbfcfb}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.primary:hover{background:var(--green2)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{position:relative;min-height:246px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:.16s ease;overflow:hidden}
+.card:hover{transform:translateY(-2px);border-color:#c6d7ce;box-shadow:var(--shadow2)}
+.card.dragging{opacity:.42;transform:scale(.985)}.card.drag-over{border-color:#8caf9d;box-shadow:0 0 0 3px rgba(31,90,68,.08),var(--shadow2)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.logo{width:112px;height:112px;border-radius:22px;overflow:hidden;background:var(--soft);border:1px solid #d8e4dd;display:grid;place-items:center;color:var(--green);font-weight:900;font-size:30px;flex:0 0 auto}
+.logo img{width:100%;height:100%;object-fit:contain;padding:8px;background:#fff}
+.card-tools{display:flex;align-items:center;gap:2px}.drag-handle,.more{border:0;background:transparent;color:#98a59f;padding:3px 5px}.drag-handle{font-size:17px;cursor:grab}.drag-handle:active{cursor:grabbing}.more{font-size:17px}
+.card h3{font-size:15px;line-height:1.22;margin:13px 0 4px;letter-spacing:-.01em}
+.desc{font-size:10px;line-height:1.4;color:var(--muted);margin:0;max-width:95%;min-height:28px}
+.bottom{margin-top:auto;padding-top:14px;display:flex;justify-content:flex-end}.open{text-decoration:none;color:var(--green);font-size:11px;font-weight:750;border:1px solid #c5d7cd;background:#fff;padding:7px 10px;border-radius:9px}.open:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.menu{position:absolute;right:14px;top:47px;z-index:5;display:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 14px 35px rgba(31,90,68,.12)}.menu.show{display:grid}.menu button{border:0;background:transparent;color:var(--text);text-align:left;padding:8px 11px;border-radius:8px;font-size:12px;min-width:110px}.menu button:hover{background:#f1f5f3}.menu .delete{color:var(--danger)}
+.empty{display:none;border:1px dashed #cbd8d1;border-radius:16px;padding:44px 20px;text-align:center;color:var(--muted);background:#fff}.empty.show{display:block}
+.backdrop{position:fixed;inset:0;background:rgba(21,48,39,.28);display:none;z-index:20}.backdrop.show{display:block}
+.drawer{position:fixed;right:0;top:0;width:min(420px,100%);height:100vh;z-index:21;background:#f9fbfa;border-left:1px solid var(--line);box-shadow:-24px 0 55px rgba(31,90,68,.12);padding:22px;overflow:auto;transform:translateX(105%);transition:.22s}.drawer.show{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between}.drawer h2{margin:0;font-size:21px}.close{border:0;background:transparent;color:#7e8c85;font-size:27px}
+.form{display:grid;gap:15px;margin-top:22px}.field label{display:block;font-weight:750;margin-bottom:7px;font-size:13px}.field input,.field select{width:100%;background:#fff;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}.field input:focus,.field select:focus{border-color:#9db9aa;box-shadow:0 0 0 3px rgba(31,90,68,.06)}
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.type-btn{border:1px solid var(--line);background:#fff;color:#6d7b74;border-radius:10px;padding:10px;font-size:12px;font-weight:750}.type-btn.active{border-color:#9fbdad;color:var(--green);background:var(--soft)}
+.dropzone{border:1px dashed #b9cbc1;border-radius:13px;padding:20px;text-align:center;color:var(--muted);background:#fff;font-size:12px}.dropzone strong{display:block;color:var(--text);margin:5px 0;font-size:13px}.dropzone input{display:none}
+.preview{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff;display:flex;align-items:center;gap:12px}.preview .logo{width:76px;height:76px;border-radius:17px}.preview strong{display:block;font-size:13px}.preview small{color:var(--muted);font-size:11px}
+.drawer-actions{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:2px}.ghost{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:10px 12px;font-size:12px;font-weight:750}.primary-action{border:1px solid var(--green);background:var(--green);color:#fff;border-radius:10px;padding:10px 13px;font-size:12px;font-weight:750}
+.settings-box{display:grid;gap:16px}.settings-note{font-size:11px;line-height:1.5;color:var(--muted);margin-top:-4px}.setting-actions{display:grid;gap:8px}.setting-actions button{width:100%;text-align:left;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:11px 12px;font-size:12px}.setting-actions button:hover{background:#f3f7f5}.setting-actions .danger{color:var(--danger)}
+@media(max-width:1120px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:820px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shell{width:min(100% - 24px,1380px)}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.brand{font-size:19px}.btn{padding:10px 12px}.logo{width:104px;height:104px}}
+</style>
 </head>
 <body>
-<div class="app-shell">
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-mark">P</div><div><b>Prestaterre</b><span>Toolbox</span></div></div>
-    <div class="nav">
-      <button class="active" data-view="home"><span class="ico">⌂</span>Accueil</button>
-      <button data-view="apps"><span class="ico">▦</span>Applications</button>
-      <button data-view="favorites"><span class="ico">☆</span>Favoris</button>
-      <button data-view="settings"><span class="ico">⚙</span>Réglages</button>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">Mytoolapp</div>
+    <div class="actions">
+      <button class="btn" id="settingsBtn">Réglages</button>
+      <button class="btn primary" id="addBtn">+ Ajouter</button>
     </div>
-    <div class="side-spacer"></div>
-    <div class="side-card"><div>Statut du portail</div><div class="status"><span class="dot"></span>Opérationnel</div><div>Les applications ajoutées depuis l’interface sont enregistrées dans ce navigateur.</div></div>
-  </aside>
-
-  <div class="content">
-    <header class="topbar">
-      <div class="top-title">Prestaterre Toolbox</div>
-      <div class="search"><input id="search" placeholder="Rechercher une application..." /></div>
-      <div class="top-actions"><button class="ghost" id="settingsTop">⚙</button><button class="primary" id="addTop">＋ Ajouter</button></div>
-    </header>
-
-    <main>
-      <div class="headline">
-        <div><h1>Tableau des applications</h1><p>Accédez rapidement à tous vos outils internes et sites publics.</p></div>
-        <button class="primary" id="addMain">＋ Ajouter une application</button>
-      </div>
-
-      <section class="kpis">
-        <div class="kpi"><div class="kpi-icon">▦</div><div><strong id="kAll">0</strong><b>applications</b><br><span>Disponibles</span></div></div>
-        <div class="kpi"><div class="kpi-icon">⌂</div><div><strong id="kInternal">0</strong><b>internes</b><br><span>Outils Prestaterre</span></div></div>
-        <div class="kpi"><div class="kpi-icon">◎</div><div><strong id="kPublic">0</strong><b>publics</b><br><span>Sites et services</span></div></div>
-        <div class="kpi"><div class="kpi-icon">☆</div><div><strong id="kFav">0</strong><b>favoris</b><br><span>Accès rapides</span></div></div>
-      </section>
-
-      <div class="toolbar">
-        <div class="tabs"><button class="active" data-filter="all">Toutes</button><button data-filter="internal">Internes</button><button data-filter="public">Publics</button><button data-filter="favorite">Favoris</button></div>
-        <div class="sort"><select id="sort"><option value="name">Trier par : Nom</option><option value="recent">Trier par : Récents</option><option value="type">Trier par : Type</option></select></div>
-      </div>
-
-      <section id="grid" class="grid"></section>
-      <div id="empty" class="empty">Aucune application ne correspond à votre recherche.</div>
-
-      <section id="settingsPanel" class="settings-panel">
-        <h3>Réglages & sauvegarde</h3>
-        <p style="color:var(--muted)">Les applications créées depuis l’interface sont stockées localement dans le navigateur. Tu peux exporter la configuration pour la réutiliser sur un autre ordinateur.</p>
-        <div class="settings-actions">
-          <button class="ghost" id="exportBtn">Exporter la configuration</button>
-          <button class="ghost" id="importBtn">Importer une configuration</button>
-          <input id="importFile" class="file-import" type="file" accept="application/json" />
-          <button class="danger" id="resetBtn">Réinitialiser les apps personnelles</button>
-        </div>
-      </section>
-    </main>
-  </div>
+  </header>
+  <main>
+    <section class="grid" id="grid"></section>
+    <div class="empty" id="empty">Aucune application.</div>
+  </main>
 </div>
 
-<div class="drawer-backdrop" id="backdrop"></div>
-<aside class="drawer" id="drawer">
-  <div class="drawer-top"><div><h2 id="drawerTitle">Ajouter une application</h2><div style="color:var(--muted);font-size:13px;margin-top:5px">3 informations suffisent : nom, lien et logo.</div></div><button class="close" id="closeDrawer">×</button></div>
+<div class="backdrop" id="backdrop"></div>
+
+<aside class="drawer" id="appDrawer">
+  <div class="drawer-head"><h2 id="drawerTitle">Ajouter une application</h2><button class="close" data-close>×</button></div>
   <div class="form">
     <div class="field"><label>Type</label><div class="type-row"><button class="type-btn active" data-type="internal">Outil interne</button><button class="type-btn" data-type="public">Site public</button></div></div>
-    <div class="field"><label>Nom de l’application</label><input id="appName" placeholder="Ex. : Google Drive" maxlength="70" /></div>
+    <div class="field"><label>Nom</label><input id="appName" placeholder="Ex. : Google Drive" maxlength="70" /></div>
     <div class="field"><label>Lien</label><input id="appLink" type="url" placeholder="https://..." /></div>
-    <div class="field"><label>Logo</label><label class="dropzone" for="logoFile"><div style="font-size:26px">☁</div><strong>Choisir ou déposer un logo</strong><span>PNG, JPG, WEBP ou SVG</span><input id="logoFile" type="file" accept="image/*,.svg" /></label></div>
-    <div class="field"><label>Description <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label><input id="appDesc" placeholder="Courte description de l’outil" maxlength="160" /></div>
-    <div class="field"><label>Aperçu</label><div class="preview"><div class="app-logo" id="previewLogo">A</div><div><strong id="previewName">Mon application</strong><small id="previewType">Outil interne</small></div></div></div>
-    <div class="drawer-actions"><button class="primary" id="saveApp">Créer l’application</button><button class="ghost" id="cancelApp">Annuler</button></div>
+    <div class="field"><label>Logo</label><label class="dropzone" for="logoFile"><div style="font-size:23px">＋</div><strong>Choisir un logo</strong><span>PNG, JPG, WEBP ou SVG</span><input id="logoFile" type="file" accept="image/*,.svg" /></label></div>
+    <div class="field"><label>Description <span style="color:var(--muted);font-weight:500">(facultatif)</span></label><input id="appDesc" placeholder="Courte description" maxlength="150" /></div>
+    <div class="field"><label>Aperçu</label><div class="preview"><div class="logo" id="previewLogo">A</div><div><strong id="previewName">Mon application</strong><small id="previewType">Outil interne</small></div></div></div>
+    <div class="drawer-actions"><button class="primary-action" id="saveApp">Créer</button><button class="ghost" data-close>Annuler</button></div>
+  </div>
+</aside>
+
+<aside class="drawer" id="settingsDrawer">
+  <div class="drawer-head"><h2>Réglages</h2><button class="close" data-close>×</button></div>
+  <div class="form settings-box">
+    <div class="field">
+      <label for="sort">Ordre des tuiles</label>
+      <select id="sort">
+        <option value="custom">Ordre personnalisé</option>
+        <option value="name-asc">Nom A → Z</option>
+        <option value="name-desc">Nom Z → A</option>
+      </select>
+      <div class="settings-note">Tu peux aussi déplacer les tuiles directement avec la poignée ⋮⋮. Cela repasse automatiquement en ordre personnalisé.</div>
+    </div>
+    <div class="setting-actions">
+      <button id="resetOrder">Réinitialiser l’ordre</button>
+      <button id="resetAll" class="danger">Réinitialiser Mytoolapp</button>
+    </div>
   </div>
 </aside>
 
 <script>
-const DEFAULT_APPS = [
-  {id:'gen-prestaterre',name:'Générateur Prestaterre',link:'#',type:'internal',description:'Création et export des slides et indicateurs Prestaterre.',favorite:true,createdAt:1,logo:''},
-  {id:'siap',name:'Rapprochement SIAP',link:'#',type:'internal',description:'Rapprochement multi-critères entre opérations et données SIAP.',favorite:false,createdAt:2,logo:''},
-  {id:'sheets',name:'Google Sheets',link:'https://docs.google.com/spreadsheets/',type:'public',description:'Feuilles de calcul et tableaux partagés.',favorite:true,createdAt:3,logo:''},
-  {id:'drive',name:'Google Drive',link:'https://drive.google.com/',type:'public',description:'Stockage et partage de fichiers.',favorite:true,createdAt:4,logo:''},
-  {id:'chatgpt',name:'ChatGPT',link:'https://chatgpt.com/',type:'public',description:'Assistant IA pour l’analyse, la rédaction et la création.',favorite:true,createdAt:5,logo:''},
-  {id:'odoo',name:'Odoo',link:'https://www.odoo.com/',type:'public',description:'Suite d’applications de gestion d’entreprise.',favorite:false,createdAt:6,logo:''}
+const DEFAULT_APPS=[
+{id:'gen',name:'Générateur Prestaterre',link:'#',type:'internal',description:'Création et export des slides et indicateurs Prestaterre.',logo:'',createdAt:1},
+{id:'siap',name:'Rapprochement SIAP',link:'#',type:'internal',description:'Rapprochement multi-critères avec les données SIAP.',logo:'',createdAt:2},
+{id:'sheets',name:'Google Sheets',link:'https://docs.google.com/spreadsheets/',type:'public',description:'Feuilles de calcul et tableaux partagés.',logo:'',createdAt:3},
+{id:'drive',name:'Google Drive',link:'https://drive.google.com/',type:'public',description:'Stockage et partage de fichiers.',logo:'',createdAt:4},
+{id:'chatgpt',name:'ChatGPT',link:'https://chatgpt.com/',type:'public',description:'Assistant IA pour l’analyse, la rédaction et la création.',logo:'',createdAt:5},
+{id:'odoo',name:'Odoo',link:'https://www.odoo.com/',type:'public',description:'Suite d’applications de gestion d’entreprise.',logo:'',createdAt:6}
 ];
-const STORE='prestaterre_toolbox_apps_v2';
-const CUSTOM='prestaterre_toolbox_custom_v2';
-let apps=[]; let currentFilter='all'; let currentType='internal'; let editingId=null; let uploadedLogo='';
-
+const STORE='prestaterre_toolbox_minimal_v1', SORT_STORE='mytoolapp_sort_v1';
+let apps=[],sortMode=localStorage.getItem(SORT_STORE)||'custom',currentType='internal',editingId=null,uploadedLogo='',dragId=null;
 const $=id=>document.getElementById(id);
-function initials(name){return (name||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
-function safeUrl(url){try{const u=new URL(url);return ['http:','https:'].includes(u.protocol)?u.href:'#'}catch(e){return '#'}}
-function load(){
-  try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');apps=Array.isArray(saved)?saved:DEFAULT_APPS.map(x=>({...x}));}
-  catch(e){apps=DEFAULT_APPS.map(x=>({...x}))}
-  render();
-}
-function persist(){localStorage.setItem(STORE,JSON.stringify(apps));}
-function customIds(){try{return JSON.parse(localStorage.getItem(CUSTOM)||'[]')}catch(e){return []}}
-function setCustomIds(ids){localStorage.setItem(CUSTOM,JSON.stringify(ids))}
-function escapeHtml(s){return String(s||'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
-function logoHtml(a){return a.logo?`<img src="${a.logo}" alt="">`:escapeHtml(initials(a.name))}
-function render(){
-  const q=$('search').value.toLowerCase().trim();
-  let list=apps.filter(a=>{
-    const okq=!q||[a.name,a.description,a.link].join(' ').toLowerCase().includes(q);
-    const okf=currentFilter==='all'||currentFilter===a.type||(currentFilter==='favorite'&&a.favorite);
-    return okq&&okf;
-  });
-  const sort=$('sort').value;
-  list.sort((a,b)=>sort==='recent'?(b.createdAt-a.createdAt):sort==='type'?(a.type.localeCompare(b.type)||a.name.localeCompare(b.name,'fr')):a.name.localeCompare(b.name,'fr'));
-  $('grid').innerHTML=list.map(a=>`<article class="card" data-id="${escapeHtml(a.id)}">
-    <div class="card-head"><div class="app-logo">${logoHtml(a)}</div><button class="fav ${a.favorite?'on':''}" title="Favori">${a.favorite?'★':'☆'}</button></div>
-    <h3>${escapeHtml(a.name)}</h3><p class="desc">${escapeHtml(a.description||'Accès rapide à cette application.')}</p>
-    <div class="badges"><span class="badge ${a.type==='public'?'public':''}">${a.type==='public'?'Public ↗':'Interne ●'}</span></div>
-    <div class="card-actions"><a class="open" href="${safeUrl(a.link)}" target="_blank" rel="noopener noreferrer">Ouvrir ${a.type==='public'?'↗':'↗'}</a><button class="more">•••</button></div>
-    <div class="menu"><button class="edit">Modifier</button><button class="delete">Supprimer</button></div>
-  </article>`).join('');
-  $('empty').classList.toggle('show',list.length===0);
-  $('kAll').textContent=apps.length;$('kInternal').textContent=apps.filter(a=>a.type==='internal').length;$('kPublic').textContent=apps.filter(a=>a.type==='public').length;$('kFav').textContent=apps.filter(a=>a.favorite).length;
-}
-function openDrawer(app=null){
-  editingId=app?.id||null;currentType=app?.type||'internal';uploadedLogo=app?.logo||'';
-  $('drawerTitle').textContent=app?'Modifier l’application':'Ajouter une application';$('saveApp').textContent=app?'Enregistrer':'Créer l’application';
-  $('appName').value=app?.name||'';$('appLink').value=app?.link||'';$('appDesc').value=app?.description||'';$('logoFile').value='';
-  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentType));updatePreview();
-  $('backdrop').classList.add('show');$('drawer').classList.add('show');setTimeout(()=>$('appName').focus(),150);
-}
-function closeDrawer(){
-  $('backdrop').classList.remove('show');$('drawer').classList.remove('show');editingId=null;uploadedLogo='';
-}
+const esc=s=>String(s||'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
+function initials(n){return (n||'A').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'A'}
+function safeUrl(u){try{const x=new URL(u);return ['http:','https:'].includes(x.protocol)?x.href:'#'}catch(e){return '#'}}
+function load(){try{const v=JSON.parse(localStorage.getItem(STORE)||'null');apps=Array.isArray(v)&&v.length?v:DEFAULT_APPS.map(x=>({...x}))}catch(e){apps=DEFAULT_APPS.map(x=>({...x}))}$('sort').value=sortMode;render()}
+function persist(){localStorage.setItem(STORE,JSON.stringify(apps))}
+function logoHtml(a){return a.logo?`<img src="${a.logo}" alt="">`:esc(initials(a.name))}
+function currentList(){const list=apps.slice();if(sortMode==='name-asc')list.sort((a,b)=>a.name.localeCompare(b.name,'fr'));if(sortMode==='name-desc')list.sort((a,b)=>b.name.localeCompare(a.name,'fr'));return list}
+function render(){const list=currentList();$('grid').innerHTML=list.map(a=>`<article class="card" data-id="${esc(a.id)}"><div class="card-top"><div class="logo">${logoHtml(a)}</div><div class="card-tools"><button class="drag-handle" draggable="true" title="Déplacer">⋮⋮</button><button class="more" title="Options">•••</button></div></div><h3>${esc(a.name)}</h3><p class="desc">${esc(a.description||'')}</p><div class="bottom"><a class="open" href="${safeUrl(a.link)}" target="_blank" rel="noopener noreferrer">Ouvrir ↗</a></div><div class="menu"><button class="edit">Modifier</button><button class="delete">Supprimer</button></div></article>`).join('');$('empty').classList.toggle('show',!list.length);bindDrag()}
+function bindDrag(){document.querySelectorAll('.card').forEach(card=>{const handle=card.querySelector('.drag-handle');handle.addEventListener('dragstart',e=>{dragId=card.dataset.id;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',dragId)});handle.addEventListener('dragend',()=>{card.classList.remove('dragging');document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));dragId=null});card.addEventListener('dragover',e=>{if(!dragId||dragId===card.dataset.id)return;e.preventDefault();card.classList.add('drag-over')});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');const targetId=card.dataset.id;if(!dragId||dragId===targetId)return;reorder(dragId,targetId);dragId=null})})}
+function reorder(sourceId,targetId){const ids=apps.map(a=>a.id),s=ids.indexOf(sourceId),t=ids.indexOf(targetId);if(s<0||t<0)return;const [moved]=apps.splice(s,1);apps.splice(t,0,moved);sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);$('sort').value=sortMode;persist();render()}
+function showDrawer(drawer){$('backdrop').classList.add('show');drawer.classList.add('show')}
+function closeDrawers(){$('backdrop').classList.remove('show');document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('show'));editingId=null;uploadedLogo=''}
+function openAppDrawer(a=null){editingId=a?.id||null;currentType=a?.type||'internal';uploadedLogo=a?.logo||'';$('drawerTitle').textContent=a?'Modifier l’application':'Ajouter une application';$('saveApp').textContent=a?'Enregistrer':'Créer';$('appName').value=a?.name||'';$('appLink').value=a?.link||'';$('appDesc').value=a?.description||'';$('logoFile').value='';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===currentType));updatePreview();showDrawer($('appDrawer'));setTimeout(()=>$('appName').focus(),100)}
 function updatePreview(){const n=$('appName').value.trim()||'Mon application';$('previewName').textContent=n;$('previewType').textContent=currentType==='public'?'Site public':'Outil interne';$('previewLogo').innerHTML=uploadedLogo?`<img src="${uploadedLogo}" alt="">`:initials(n)}
-function saveApp(){
-  const name=$('appName').value.trim(),link=$('appLink').value.trim(),description=$('appDesc').value.trim();
-  if(!name){alert('Indique le nom de l’application.');return} if(safeUrl(link)==='#'){alert('Indique un lien valide commençant par https://');return}
-  if(editingId){const i=apps.findIndex(a=>a.id===editingId);if(i>=0)apps[i]={...apps[i],name,link:safeUrl(link),type:currentType,description,logo:uploadedLogo};}
-  else{const id='app-'+Date.now();apps.push({id,name,link:safeUrl(link),type:currentType,description,logo:uploadedLogo,favorite:false,createdAt:Date.now()});const ids=customIds();ids.push(id);setCustomIds(ids)}
-  persist();render();closeDrawer();
-}
-
-$('addTop').onclick=$('addMain').onclick=()=>openDrawer();$('closeDrawer').onclick=$('cancelApp').onclick=$('backdrop').onclick=closeDrawer;
-document.querySelectorAll('.type-btn').forEach(b=>b.onclick=()=>{currentType=b.dataset.type;document.querySelectorAll('.type-btn').forEach(x=>x.classList.toggle('active',x===b));updatePreview()});
-$('appName').addEventListener('input',updatePreview);$('search').addEventListener('input',render);$('sort').addEventListener('change',render);
-$('logoFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(f.size>2.5*1024*1024){alert('Logo trop volumineux. Choisis un fichier de moins de 2,5 Mo.');return}const r=new FileReader();r.onload=()=>{uploadedLogo=r.result;updatePreview()};r.readAsDataURL(f)});
-$('saveApp').onclick=saveApp;
-document.querySelector('.tabs').addEventListener('click',e=>{if(!e.target.dataset.filter)return;currentFilter=e.target.dataset.filter;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b===e.target));render()});
-$('grid').addEventListener('click',e=>{
-  const card=e.target.closest('.card');if(!card)return;const id=card.dataset.id,a=apps.find(x=>x.id===id);if(!a)return;
-  if(e.target.closest('.fav')){a.favorite=!a.favorite;persist();render();return}
-  if(e.target.closest('.more')){card.querySelector('.menu').classList.toggle('show');return}
-  if(e.target.closest('.edit')){openDrawer(a);return}
-  if(e.target.closest('.delete')){if(confirm(`Supprimer “${a.name}” ?`)){apps=apps.filter(x=>x.id!==id);setCustomIds(customIds().filter(x=>x!==id));persist();render()}return}
-});
-document.addEventListener('click',e=>{if(!e.target.closest('.card'))document.querySelectorAll('.menu').forEach(m=>m.classList.remove('show'))});
-function showSettings(){ $('settingsPanel').classList.toggle('show'); $('settingsPanel').scrollIntoView({behavior:'smooth',block:'center'}); }
-$('settingsTop').onclick=showSettings;document.querySelector('[data-view="settings"]').onclick=()=>{document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));document.querySelector('[data-view="settings"]').classList.add('active');$('settingsPanel').classList.add('show');$('settingsPanel').scrollIntoView({behavior:'smooth'});} ;
-document.querySelector('[data-view="favorites"]').onclick=()=>{currentFilter='favorite';document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.filter==='favorite'));render()};
-$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(apps,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='prestaterre-toolbox-config.json';a.click();URL.revokeObjectURL(a.href)};
-$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;apps=d;persist();render();alert('Configuration importée.')}catch(_){alert('Fichier de configuration invalide.')}};r.readAsText(f)};
-$('resetBtn').onclick=()=>{if(confirm('Supprimer toutes les apps personnelles et revenir à la configuration par défaut ?')){apps=DEFAULT_APPS.map(x=>({...x}));persist();setCustomIds([]);render()}};
+function saveApp(){const name=$('appName').value.trim(),link=$('appLink').value.trim(),description=$('appDesc').value.trim();if(!name){alert('Indique le nom de l’application.');return}if(safeUrl(link)==='#'){alert('Indique un lien valide commençant par https://');return}if(editingId){const i=apps.findIndex(a=>a.id===editingId);if(i>=0)apps[i]={...apps[i],name,link:safeUrl(link),type:currentType,description,logo:uploadedLogo}}else apps.push({id:'app-'+Date.now(),name,link:safeUrl(link),type:currentType,description,logo:uploadedLogo,createdAt:Date.now()});persist();sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);$('sort').value=sortMode;render();closeDrawers()}
+$('addBtn').onclick=()=>openAppDrawer();$('settingsBtn').onclick=()=>showDrawer($('settingsDrawer'));$('backdrop').onclick=closeDrawers;document.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeDrawers);
+document.querySelectorAll('.type-btn').forEach(b=>b.onclick=()=>{currentType=b.dataset.type;document.querySelectorAll('.type-btn').forEach(x=>x.classList.toggle('active',x===b));updatePreview()});$('appName').oninput=updatePreview;$('saveApp').onclick=saveApp;
+$('logoFile').onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>2.5*1024*1024){alert('Choisis un logo de moins de 2,5 Mo.');return}const r=new FileReader();r.onload=()=>{uploadedLogo=r.result;updatePreview()};r.readAsDataURL(f)};
+$('sort').onchange=e=>{sortMode=e.target.value;localStorage.setItem(SORT_STORE,sortMode);render()};
+$('resetOrder').onclick=()=>{apps.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);$('sort').value=sortMode;persist();render();closeDrawers()};
+$('resetAll').onclick=()=>{if(confirm('Réinitialiser toutes les applications et l’ordre ?')){apps=DEFAULT_APPS.map(x=>({...x}));sortMode='custom';localStorage.setItem(SORT_STORE,sortMode);persist();render();closeDrawers()}};
+$('grid').onclick=e=>{const card=e.target.closest('.card');if(!card)return;const a=apps.find(x=>x.id===card.dataset.id);if(!a)return;if(e.target.closest('.more')){card.querySelector('.menu').classList.toggle('show');return}if(e.target.closest('.edit')){openAppDrawer(a);return}if(e.target.closest('.delete')){if(confirm(`Supprimer “${a.name}” ?`)){apps=apps.filter(x=>x.id!==a.id);persist();render()}return}};
+document.addEventListener('click',e=>{if(!e.target.closest('.more'))document.querySelectorAll('.menu').forEach(m=>m.classList.remove('show'))});
 load();
 </script>
 </body>

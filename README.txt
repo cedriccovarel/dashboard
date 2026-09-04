@@ -1,18 +1,10 @@
-MYTOOLAPP - VERSION BUREAU MAC
+MYTOOLAPP + GOOGLE AGENDA
 
-1. Dépose index.html dans ton dépôt GitHub Pages.
-2. Active GitHub Pages dans Settings > Pages.
-3. Ouvre l’URL GitHub Pages dans Plash pour l’utiliser comme fond de bureau interactif sur macOS.
+1. Dépose index.html sur GitHub Pages.
+2. Dans Google Cloud, active Google Calendar API.
+3. Crée un OAuth Client ID de type Application Web.
+4. Dans « Origines JavaScript autorisées », ajoute l’origine affichée dans Mytoolapp > Réglages (ex. https://cedriccovarel.github.io).
+5. Crée une clé API et restreins-la idéalement à Google Calendar API + à ton domaine GitHub Pages.
+6. Dans Mytoolapp > Réglages, colle le Client ID et la clé API, puis clique « Se connecter avec Google ».
 
-UTILISATION
-- Double clic sur une icône : ouvre l’outil.
-- Glisser-déposer : déplace librement les icônes.
-- Clic droit : ouvrir / modifier / supprimer.
-- Réglages : fond d’écran, Google Agenda, réalignement des icônes, export/import.
-- Ajouter : nom + lien + logo.
-
-GOOGLE AGENDA
-Dans Google Agenda : Paramètres > ton agenda > Intégrer l’agenda > copier l’URL d’intégration puis la coller dans Réglages.
-
-FOND D’ÉCRAN
-Réglages > Fond d’écran > Choisir une image. L’image est stockée localement dans le navigateur.
+Le widget demande seulement le scope lecture seule Google Calendar.

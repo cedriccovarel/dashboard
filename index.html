@@ -69,6 +69,30 @@
   .calendar-body iframe{width:100%;height:100%;border:0;display:block;background:white}
   .calendar-empty{height:100%;display:flex;align-items:center;justify-content:center;padding:28px;text-align:center;color:#52655e;font-size:13px;line-height:1.5;background:linear-gradient(180deg,#fff,#f5f8f6)}
   .calendar-empty button{margin-top:14px;border:0;background:var(--green);color:white;padding:10px 13px;border-radius:10px;font-weight:700;cursor:pointer}
+  .calendar-content{height:100%;overflow:auto;background:linear-gradient(180deg,#fff 0%,#f7faf8 100%);color:#17362b;padding:14px 14px 18px}
+  .calendar-connect{height:100%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:#5c6e66;background:linear-gradient(180deg,#fff,#f5f8f6)}
+  .calendar-connect .icon{width:54px;height:54px;margin:0 auto 12px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#eef5f1;color:var(--green);font-size:25px;font-weight:800}
+  .calendar-connect strong{display:block;color:#214838;font-size:15px;margin-bottom:6px}
+  .calendar-connect p{font-size:12px;line-height:1.5;margin:0 auto 14px;max-width:270px}
+  .calendar-connect button{border:0;background:var(--green);color:white;padding:10px 14px;border-radius:11px;font-weight:750;cursor:pointer}
+  .calendar-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:0 2px;color:#6b7d75;font-size:11px}
+  .calendar-status .dot{width:7px;height:7px;border-radius:50%;background:#48a879;display:inline-block;margin-right:6px;box-shadow:0 0 0 3px rgba(72,168,121,.12)}
+  .calendar-day{margin-top:13px}
+  .calendar-day:first-child{margin-top:0}
+  .calendar-day-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#73847d;margin:0 0 7px;padding:0 3px}
+  .calendar-event{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:start;padding:10px 10px;border-radius:13px;background:white;border:1px solid #e4ebe7;margin-bottom:7px;box-shadow:0 3px 10px rgba(25,63,48,.04);text-decoration:none;color:inherit;transition:.15s ease}
+  .calendar-event:hover{border-color:#b9d3c7;transform:translateY(-1px);box-shadow:0 7px 16px rgba(25,63,48,.08)}
+  .calendar-time{font-size:11px;font-weight:800;color:var(--green);padding-top:2px;white-space:nowrap}
+  .calendar-event-main{min-width:0}
+  .calendar-event-title{font-size:12px;font-weight:750;line-height:1.25;color:#1d3e32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .calendar-event-meta{font-size:10px;color:#839089;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .calendar-error{padding:16px;border-radius:13px;background:#fff5f5;border:1px solid #f0d4d4;color:#8c3d3d;font-size:11px;line-height:1.5}
+  .calendar-loading{height:100%;display:flex;align-items:center;justify-content:center;color:#6b7c74;font-size:12px;background:#fff}
+  .calendar-footer-link{display:block;text-align:center;margin-top:12px;color:var(--green);font-size:11px;font-weight:750;text-decoration:none}
+  .settings-help{margin-top:7px!important;font-size:10px!important;color:#7b8b84!important;word-break:break-word}
+  .connection-state{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:7px 9px;border-radius:999px;background:#eef5f1;color:#46675a}
+  .connection-state.ok{background:#e8f6ef;color:#2e7b5b}
+
 
   .modal-backdrop{position:fixed;inset:0;background:rgba(5,15,12,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:3000;padding:18px}
   .modal-backdrop.show{display:flex}
@@ -123,7 +147,7 @@
 
 <section id="calendarWidget" class="calendar-widget">
   <div class="calendar-head" id="calendarDrag">
-    <strong>Google Agenda</strong>
+    <strong>Agenda</strong>
     <div class="calendar-tools"><button id="calendarRefresh" title="Recharger">↻</button><button id="calendarHide" title="Masquer">×</button></div>
   </div>
   <div class="calendar-body" id="calendarBody"></div>
@@ -161,10 +185,17 @@
     </div>
 
     <div class="settings-row">
-      <h3>Lien d’intégration Google Agenda</h3>
-      <p>Colle l’URL d’intégration fournie par Google Agenda dans « Intégrer l’agenda ».</p>
-      <div class="field" style="margin:0"><input id="calendarUrl" placeholder="https://calendar.google.com/calendar/embed?..." /></div>
-      <div class="row-actions" style="margin-top:9px"><button class="btn" id="saveCalendar">Enregistrer l’agenda</button></div>
+      <h3>Connexion Google Agenda</h3>
+      <p>Mytoolapp lit uniquement tes prochains rendez-vous via l’API Google Calendar. Ton agenda n’a pas besoin d’être public.</p>
+      <div class="field"><label>Client ID Google</label><input id="calendarClientId" placeholder="...apps.googleusercontent.com" autocomplete="off" /></div>
+      <div class="field" style="margin-bottom:9px"><label>Clé API Google</label><input id="calendarApiKey" placeholder="AIza..." autocomplete="off" /></div>
+      <p class="settings-help" id="googleOriginHelp"></p>
+      <div class="row-actions" style="margin-top:10px">
+        <button class="btn" id="saveGoogleCalendar">Enregistrer</button>
+        <button class="btn primary" id="googleConnectBtn">Se connecter avec Google</button>
+        <button class="btn" id="googleDisconnectBtn" style="display:none">Déconnecter</button>
+        <span class="connection-state" id="googleConnectionState">Non connecté</span>
+      </div>
     </div>
 
     <div class="settings-row">
@@ -203,9 +234,16 @@ const defaultApps=[
 
 function getState(){
  try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw)}catch(e){}
- return {apps:defaultApps,calendar:{visible:true,url:'',x:null,y:98,w:390,h:510}};
+ return {apps:defaultApps,calendar:{visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510}};
 }
 let state=getState();
+if(!state.calendar) state.calendar={visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510};
+state.calendar.clientId=state.calendar.clientId||'';
+state.calendar.apiKey=state.calendar.apiKey||'';
+if(state.calendar.x===undefined) state.calendar.x=null;
+if(state.calendar.y===undefined) state.calendar.y=98;
+if(state.calendar.w===undefined) state.calendar.w=390;
+if(state.calendar.h===undefined) state.calendar.h=510;
 function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
 
 function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(DB_STORE))req.result.createObjectStore(DB_STORE)};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
@@ -285,16 +323,133 @@ wallpaperClear.onclick=async()=>{await dbDel('wallpaper');await applyWallpaper()
 function resizeImage(file,maxW,maxH,quality){return new Promise(resolve=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxW/img.width,maxH/img.height);const c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',quality))};img.src=r.result};r.readAsDataURL(file)})}
 
 const cal=document.getElementById('calendarWidget'),calBody=document.getElementById('calendarBody');
+const DISCOVERY_DOC='https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+const GOOGLE_SCOPE='https://www.googleapis.com/auth/calendar.readonly';
+let gapiLibraryReady=false, gisLibraryReady=false, googleClientReady=false, tokenClient=null;
+let initializedClientId='', initializedApiKey='';
+
+function calendarConfigReady(){return !!(state.calendar?.clientId&&state.calendar?.apiKey)}
+function googleToken(){try{return window.gapi?.client?.getToken?.()||null}catch(e){return null}}
+function isGoogleConnected(){return !!googleToken()?.access_token}
+
 function renderCalendar(){
- const c=state.calendar||{visible:true,url:'',x:null,y:98,w:390,h:510};state.calendar=c;
+ const c=state.calendar||{visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510};state.calendar=c;
  cal.classList.toggle('hidden',!c.visible);cal.style.width=(c.w||390)+'px';cal.style.height=(c.h||510)+'px';cal.style.top=(c.y||98)+'px';
  if(c.x===null||c.x===undefined){cal.style.left=(window.innerWidth-(c.w||390)-30)+'px'}else cal.style.left=c.x+'px';
- if(c.url){calBody.innerHTML=`<iframe src="${escapeHTML(c.url)}" loading="lazy"></iframe>`}else calBody.innerHTML=`<div class="calendar-empty"><div><strong>Google Agenda</strong><br>Ajoute ton lien d’intégration dans Réglages pour afficher directement ton agenda ici.<br><button onclick="settingsBtn.click()">Configurer</button></div></div>`;
+ if(!calendarConfigReady()){
+   calBody.innerHTML=`<div class="calendar-connect"><div><div class="icon">31</div><strong>Configurer Google Agenda</strong><p>Ajoute ton Client ID et ta clé API dans Réglages. Ton agenda reste privé.</p><button id="calendarSetupBtn">Configurer</button></div></div>`;
+   document.getElementById('calendarSetupBtn')?.addEventListener('click',()=>settingsBtn.click());
+   return;
+ }
+ if(!isGoogleConnected()){
+   calBody.innerHTML=`<div class="calendar-connect"><div><div class="icon">G</div><strong>Google Agenda</strong><p>Connecte ton compte Google pour afficher tes prochains rendez-vous.</p><button id="calendarConnectInline">Se connecter</button></div></div>`;
+   document.getElementById('calendarConnectInline')?.addEventListener('click',handleGoogleAuth);
+   return;
+ }
+ loadCalendarEvents();
 }
+
+function formatDayKey(dateLike){const d=new Date(dateLike);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function dayLabel(dateLike){
+ const d=new Date(dateLike), today=new Date(), tomorrow=new Date();tomorrow.setDate(today.getDate()+1);
+ const key=formatDayKey(d),tk=formatDayKey(today),tmk=formatDayKey(tomorrow);
+ if(key===tk)return "Aujourd’hui";if(key===tmk)return "Demain";
+ return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long'}).format(d);
+}
+function eventTime(ev){
+ if(ev.start?.date&&!ev.start?.dateTime)return 'Journée';
+ const d=new Date(ev.start?.dateTime||ev.start?.date);return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(d);
+}
+function eventStart(ev){return ev.start?.dateTime||ev.start?.date||new Date().toISOString()}
+function eventMeta(ev){return ev.location||ev.organizer?.displayName||''}
+
+async function loadCalendarEvents(){
+ if(!isGoogleConnected()){renderCalendar();return}
+ calBody.innerHTML='<div class="calendar-loading">Chargement de l’agenda…</div>';
+ try{
+   const now=new Date(), until=new Date();until.setDate(until.getDate()+14);
+   const response=await gapi.client.calendar.events.list({calendarId:'primary',timeMin:now.toISOString(),timeMax:until.toISOString(),showDeleted:false,singleEvents:true,maxResults:12,orderBy:'startTime'});
+   const events=response.result.items||[];
+   renderCalendarEvents(events);
+ }catch(err){
+   console.error(err);
+   const msg=escapeHTML(err?.result?.error?.message||err?.message||'Impossible de charger Google Agenda.');
+   calBody.innerHTML=`<div class="calendar-content"><div class="calendar-error"><strong>Agenda indisponible</strong><br>${msg}<br><br><button class="btn" id="calendarReconnectBtn">Reconnecter Google</button></div></div>`;
+   document.getElementById('calendarReconnectBtn')?.addEventListener('click',handleGoogleAuth);
+ }
+}
+
+function renderCalendarEvents(events){
+ const groups=new Map();
+ for(const ev of events){const start=eventStart(ev);const key=formatDayKey(start);if(!groups.has(key))groups.set(key,{date:start,events:[]});groups.get(key).events.push(ev)}
+ let body='';
+ if(!events.length){body='<div class="calendar-connect"><div><div class="icon">✓</div><strong>Aucun rendez-vous à venir</strong><p>Rien de prévu dans les 14 prochains jours.</p></div></div>';calBody.innerHTML=body;return}
+ for(const group of groups.values()){
+   body+=`<section class="calendar-day"><div class="calendar-day-title">${escapeHTML(dayLabel(group.date))}</div>`;
+   for(const ev of group.events){
+     const title=escapeHTML(ev.summary||'Sans titre'),time=escapeHTML(eventTime(ev)),meta=escapeHTML(eventMeta(ev)),href=escapeHTML(ev.htmlLink||'https://calendar.google.com/calendar/u/0/r');
+     body+=`<a class="calendar-event" href="${href}" target="_blank" rel="noopener"><div class="calendar-time">${time}</div><div class="calendar-event-main"><div class="calendar-event-title">${title}</div>${meta?`<div class="calendar-event-meta">${meta}</div>`:''}</div></a>`;
+   }
+   body+='</section>';
+ }
+ calBody.innerHTML=`<div class="calendar-content"><div class="calendar-status"><span><span class="dot"></span>Google Agenda connecté</span><span>${events.length} événement${events.length>1?'s':''}</span></div>${body}<a class="calendar-footer-link" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">Ouvrir Google Agenda ↗</a></div>`;
+}
+
+async function initializeGoogleCalendar(force=false){
+ if(!gapiLibraryReady||!gisLibraryReady||!calendarConfigReady())return false;
+ const clientId=state.calendar.clientId.trim(),apiKey=state.calendar.apiKey.trim();
+ if(googleClientReady&&!force&&initializedClientId===clientId&&initializedApiKey===apiKey)return true;
+ try{
+   await gapi.client.init({apiKey,discoveryDocs:[DISCOVERY_DOC]});
+   tokenClient=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:GOOGLE_SCOPE,callback:()=>{}});
+   googleClientReady=true;initializedClientId=clientId;initializedApiKey=apiKey;updateGoogleConnectionUI();return true;
+ }catch(err){console.error('Google init error',err);googleClientReady=false;updateGoogleConnectionUI('Erreur de configuration');return false}
+}
+
+async function handleGoogleAuth(){
+ saveGoogleCalendarConfig();
+ const ready=await initializeGoogleCalendar();
+ if(!ready){alert('Vérifie le Client ID Google et la clé API dans Réglages.');return}
+ tokenClient.callback=async(resp)=>{
+   if(resp.error!==undefined){console.error(resp);updateGoogleConnectionUI('Connexion refusée');return}
+   updateGoogleConnectionUI();hideModal(settingsModal);await loadCalendarEvents();
+ };
+ if(gapi.client.getToken()===null)tokenClient.requestAccessToken({prompt:'consent'});else tokenClient.requestAccessToken({prompt:''});
+}
+
+function googleSignOut(){
+ const token=googleToken();
+ if(token?.access_token&&window.google?.accounts?.oauth2){google.accounts.oauth2.revoke(token.access_token,()=>{});}
+ try{gapi.client.setToken(null)}catch(e){}
+ updateGoogleConnectionUI();renderCalendar();
+}
+
+function saveGoogleCalendarConfig(){
+ const cid=(document.getElementById('calendarClientId')?.value||state.calendar.clientId||'').trim();
+ const key=(document.getElementById('calendarApiKey')?.value||state.calendar.apiKey||'').trim();
+ const changed=cid!==state.calendar.clientId||key!==state.calendar.apiKey;
+ state.calendar.clientId=cid;state.calendar.apiKey=key;saveState();
+ if(changed){googleClientReady=false;initializedClientId='';initializedApiKey='';try{gapi.client.setToken(null)}catch(e){}}
+ initializeGoogleCalendar(true);renderCalendar();updateGoogleConnectionUI();
+}
+
+function updateGoogleConnectionUI(message=''){
+ const s=document.getElementById('googleConnectionState'),disc=document.getElementById('googleDisconnectBtn');
+ if(!s)return;
+ const connected=isGoogleConnected();
+ s.classList.toggle('ok',connected);s.textContent=message||(connected?'Connecté':'Non connecté');
+ if(disc)disc.style.display=connected?'inline-flex':'none';
+}
+
+window.gapiLoaded=function(){gapi.load('client',async()=>{gapiLibraryReady=true;await initializeGoogleCalendar();updateGoogleConnectionUI()})};
+window.gisLoaded=function(){gisLibraryReady=true;initializeGoogleCalendar();updateGoogleConnectionUI()};
+
 calendarHide.onclick=()=>{state.calendar.visible=false;saveState();renderCalendar()};
-calendarRefresh.onclick=()=>renderCalendar();
+calendarRefresh.onclick=()=>isGoogleConnected()?loadCalendarEvents():renderCalendar();
 calendarToggle.onchange=()=>{state.calendar.visible=calendarToggle.checked;saveState();renderCalendar()};
-saveCalendar.onclick=()=>{state.calendar.url=calendarUrl.value.trim();saveState();renderCalendar()};
+document.getElementById('saveGoogleCalendar').onclick=saveGoogleCalendarConfig;
+document.getElementById('googleConnectBtn').onclick=handleGoogleAuth;
+document.getElementById('googleDisconnectBtn').onclick=googleSignOut;
 
 function makeWidgetDraggable(){
  const handle=document.getElementById('calendarDrag');let drag=false,ox=0,oy=0;
@@ -304,7 +459,13 @@ function makeWidgetDraggable(){
  const ro=new ResizeObserver(()=>{if(cal.offsetParent!==null){state.calendar.w=cal.offsetWidth;state.calendar.h=cal.offsetHeight;clearTimeout(window.__calResizeTimer);window.__calResizeTimer=setTimeout(saveState,180)}});ro.observe(cal);
 }
 
-function syncSettings(){calendarToggle.checked=state.calendar?.visible!==false;calendarUrl.value=state.calendar?.url||''}
+function syncSettings(){
+ calendarToggle.checked=state.calendar?.visible!==false;
+ document.getElementById('calendarClientId').value=state.calendar?.clientId||'';
+ document.getElementById('calendarApiKey').value=state.calendar?.apiKey||'';
+ document.getElementById('googleOriginHelp').textContent=`Origine JavaScript autorisée à ajouter dans Google Cloud : ${location.origin}`;
+ updateGoogleConnectionUI();
+}
 autoArrangeBtn=document.getElementById('autoArrange');autoArrangeBtn.onclick=autoArrange;
 
 exportBtn.onclick=async()=>{
@@ -312,11 +473,13 @@ exportBtn.onclick=async()=>{
 };
 importBtn.onclick=()=>importFile.click();
 importFile.onchange=()=>{const f=importFile.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const p=JSON.parse(r.result);if(p.state)state=p.state;else state=p;if(p.wallpaper)await dbSet('wallpaper',p.wallpaper);saveState();renderApps();renderCalendar();await applyWallpaper();alert('Configuration importée.')}catch(e){alert('Fichier invalide.')}};r.readAsText(f)};
-resetBtn.onclick=async()=>{if(!confirm('Réinitialiser Mytoolapp ?'))return;localStorage.removeItem(STORAGE_KEY);await dbDel('wallpaper');state={apps:JSON.parse(JSON.stringify(defaultApps)),calendar:{visible:true,url:'',x:null,y:98,w:390,h:510}};saveState();renderApps();renderCalendar();await applyWallpaper()};
+resetBtn.onclick=async()=>{if(!confirm('Réinitialiser Mytoolapp ?'))return;localStorage.removeItem(STORAGE_KEY);await dbDel('wallpaper');state={apps:JSON.parse(JSON.stringify(defaultApps)),calendar:{visible:true,clientId:'',apiKey:'',x:null,y:98,w:390,h:510}};saveState();renderApps();renderCalendar();await applyWallpaper()};
 
 window.addEventListener('resize',()=>{state.apps.forEach(a=>{a.x=Math.min(a.x??0,window.innerWidth-106);a.y=Math.min(a.y??98,window.innerHeight-118)});saveState();renderApps();renderCalendar()});
 
 renderApps();renderCalendar();makeWidgetDraggable();applyWallpaper();
 </script>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
